@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>North Pole Nice List Certificate</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Great+Vibes&family=Special+Elite&family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- RESET & BASE --- */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            background-color: #1a0505;
+            background-image: radial-gradient(circle at center, #2b0a0a 0%, #000000 100%);
+            /* Fallback to Serif for Chinese if Google font fails */
+            font-family: 'Cinzel', 'Noto Serif SC', serif; 
+            color: #2c2c2c;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            overflow-x: hidden;
+            padding: 20px;
+        }
+
+        /* --- LANGUAGE SWITCHER (New) --- */
+        .lang-switch {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 200;
+            background: rgba(0,0,0,0.6);
+            border: 1px solid #d4af37;
+            color: #d4af37;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+        }
+        .lang-switch:hover { background: rgba(0,0,0,0.8); }
+
+        /* --- SNOWFALL EFFECT --- */
+        .snow-container {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 100;
+            overflow: hidden;
+        }
+        .snowflake {
+            position: absolute;
+            top: -10px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            animation: fall linear infinite;
+        }
+        @keyframes fall { to { transform: translateY(110vh); } }
+
+        /* --- CERTIFICATE CONTAINER --- */
+        .certificate-paper {
+            background-color: #f4e4bc;
+            background-image: 
+                url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' opacity='0.4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.15'/%3E%3C/svg%3E");
+            width: 100%;
+            max-width: 480px;
+            padding: 25px;
+            border: 2px solid #b8860b;
+            outline: 4px double #b8860b;
+            outline-offset: 4px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+            position: relative;
+            margin-bottom: 40px;
+            margin-top: 40px; /* Space for language button */
+            text-align: center;
+        }
+
+        .seal {
+            width: 80px; height: 80px; margin: 0 auto 15px;
+            background: #8b0000; border-radius: 50%; border: 3px solid #d4af37;
+            display: flex; align-items: center; justify-content: center;
+            color: #d4af37; font-weight: bold; font-size: 10px;
+            text-transform: uppercase; letter-spacing: 1px;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+        }
+        
+        h1.title {
+            font-size: 18px; color: #4a3b2a;
+            border-bottom: 2px solid #4a3b2a; padding-bottom: 10px; margin-bottom: 20px;
+            text-transform: uppercase; letter-spacing: 2px;
+            line-height: 1.4;
+        }
+
+        /* --- TYPEWRITER TEXT --- */
+        .official-text {
+            font-family: 'Special Elite', 'Noto Serif SC', monospace;
+            font-size: 14px;
+            line-height: 1.8;
+            color: #333;
+            text-align: left;
+            margin-bottom: 25px;
+            min-height: 100px; /* Height buffer */
+        }
+        .cursor {
+            display: inline-block; width: 8px; height: 16px;
+            background-color: #333; animation: blink 1s step-end infinite;
+            vertical-align: middle;
+        }
+        @keyframes blink { 50% { opacity: 0; } }
+
+        /* --- DYNAMIC NAME --- */
+        .child-name {
+            font-family: 'Great Vibes', cursive; /* English Script */
+            font-size: 42px;
+            color: #8b0000;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+            margin: 10px 0 30px 0;
+            line-height: 1.2;
+            transform: rotate(-2deg);
+        }
+        /* Chinese name style override if needed */
+        .child-name.cn-font {
+            font-family: 'Noto Serif SC', serif;
+            font-weight: bold;
+            font-style: italic;
+        }
+
+        /* --- MAGIC LINK BUTTON --- */
+        .magic-btn {
+            display: block; width: 100%; padding: 15px 10px;
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            background-size: 200% 200%;
+            animation: gradientMove 5s ease infinite;
+            color: white; text-decoration: none; border-radius: 8px;
+            font-weight: bold; font-size: 14px; margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(253, 187, 45, 0.4);
+            border: 1px solid rgba(255,255,255,0.3);
+            text-transform: uppercase; letter-spacing: 1px;
+            transition: transform 0.2s;
+        }
+        .magic-btn:active { transform: scale(0.98); }
+        @keyframes gradientMove {
+            0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; }
+        }
+
+        .video-wrapper {
+            width: 100%; border: 5px solid #2b0a0a; border-radius: 4px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3); background: #000;
+            position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;
+        }
+        .video-wrapper video {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;
+        }
+
+        .signature {
+            margin-top: 20px; font-family: 'Great Vibes', cursive;
+            font-size: 24px; color: #4a3b2a; text-align: right; opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+
+    <button class="lang-switch" id="lang-btn">Switch to 中文</button>
+    <div class="snow-container" id="snow"></div>
+
+    <div class="certificate-paper">
+        <div class="seal">
+            <span id="txt-seal">OFFICIAL<br>NP-25</span>
+        </div>
+        
+        <h1 class="title" id="txt-title">Official Nice List Certificate 2025</h1>
+
+        <div class="official-text">
+            <span id="typed-output"></span><span class="cursor"></span>
+        </div>
+
+        <div class="child-name" id="name-display"></div>
+
+        <a href="#" id="magic-link" class="magic-btn">
+            ✨ Loading Magic... ✨
+        </a>
+
+        <div class="video-wrapper">
+            <video controls poster="poster.jpg" playsinline>
+                <source src="santa_video.mp4" type="video/mp4">
+            </video>
+        </div>
+
+        <div class="signature" id="txt-sign">
+            Santa Claus
+        </div>
+    </div>
+
+    <script>
+        // --- DATA & CONFIG ---
+        const dictionary = {
+            en: {
+                seal: "OFFICIAL<br>NP-25",
+                title: "Official Nice List Certificate 2025",
+                typewriter: "DEPARTMENT OF ELVES // TOP SECRET.\nWe have reviewed the behavior logs for 2025. Despite minor incidents, the overall kindness rating exceeds expectations. It is hereby certified that the subject below has been added to the PERMANENT NICE LIST.",
+                btnText: "Switch to 中文",
+                defaultName: "Dear Child",
+                linkPattern: "✨ Click to view [NAME]'s<br>Holographic Gift ✨",
+                sign: "Santa Claus"
+            },
+            zh: {
+                seal: "官方认证<br>NP-25",
+                title: "2025年 北极“好孩子”官方认证",
+                typewriter: "精灵事务部 // 绝密档案。\n我们审查了2025年的行为记录。尽管有过小调皮，但整体善良指数远超预期。特此证明：以下被提名者已被正式列入《2025年度永久好孩子名单》。",
+                btnText: "Switch to English",
+                defaultName: "亲爱的孩子",
+                linkPattern: "✨ 点击查看 [NAME] 的<br>全息魔法礼物 ✨",
+                sign: "圣诞老人"
+            }
+        };
+
+        let currentLang = 'en'; // Default
+        let typewriterTimeout;
+        
+        // URL Param Logic
+        const urlParams = new URLSearchParams(window.location.search);
+        let rawName = urlParams.get('name');
+        const cleanName = rawName ? rawName.replace(/</g, "&lt;").replace(/>/g, "&gt;") : null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Init Snow
+            createSnow();
+            // Init Page Content
+            renderPage();
+            
+            // Toggle Event
+            document.getElementById('lang-btn').addEventListener('click', () => {
+                currentLang = currentLang === 'en' ? 'zh' : 'en';
+                renderPage();
+            });
+        });
+
+        function renderPage() {
+            const data = dictionary[currentLang];
+            const nameToUse = cleanName || data.defaultName;
+
+            // 1. Static Text Updates
+            document.getElementById('txt-seal').innerHTML = data.seal;
+            document.getElementById('txt-title').textContent = data.title;
+            document.getElementById('lang-btn').textContent = data.btnText;
+            document.getElementById('txt-sign').textContent = data.sign;
+
+            // 2. Name & Link Updates
+            const nameEl = document.getElementById('name-display');
+            nameEl.textContent = nameToUse;
+            
+            // Adjust font for Chinese name to look good
+            if (currentLang === 'zh') nameEl.classList.add('cn-font');
+            else nameEl.classList.remove('cn-font');
+
+            const linkEl = document.getElementById('magic-link');
+            linkEl.innerHTML = data.linkPattern.replace('[NAME]', nameToUse);
+            // Pass language param to next page so it stays consistent
+            linkEl.href = `magic.html?name=${encodeURIComponent(nameToUse)}&lang=${currentLang}`;
+
+            // 3. Reset & Start Typewriter
+            const typedOutput = document.getElementById('typed-output');
+            typedOutput.textContent = ''; // Clear previous
+            clearTimeout(typewriterTimeout); // Stop previous loop
+            
+            let charIndex = 0;
+            const textToType = data.typewriter;
+            
+            function typeStep() {
+                if (charIndex < textToType.length) {
+                    typedOutput.textContent += textToType.charAt(charIndex);
+                    charIndex++;
+                    typewriterTimeout = setTimeout(typeStep, 35);
+                }
+            }
+            typeStep();
+        }
+
+        function createSnow() {
+            const snowContainer = document.getElementById('snow');
+            const particleCount = 40; 
+            for (let i = 0; i < particleCount; i++) {
+                const flake = document.createElement('div');
+                flake.className = 'snowflake';
+                const size = Math.random() * 5 + 2 + 'px';
+                flake.style.width = size;
+                flake.style.height = size;
+                flake.style.left = Math.random() * 100 + 'vw';
+                flake.style.animationDuration = Math.random() * 3 + 2 + 's';
+                flake.style.opacity = Math.random();
+                flake.style.animationDelay = Math.random() * 5 + 's';
+                snowContainer.appendChild(flake);
+            }
+        }
+    </script>
+</body>
+</html>
