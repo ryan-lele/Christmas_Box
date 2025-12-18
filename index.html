@@ -2,158 +2,215 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Commander's Terminal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>North Pole Connection</title>
+    <script src="https://cdn.bootcdn.net/ajax/libs/tailwindcss/3.3.3/cdn.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Noto+Serif+SC:wght@300;700&family=Ma+Shan+Zheng&family=Special+Elite&display=swap" rel="stylesheet">
+    
     <style>
-        /* 全局设定 */
-        body, html {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            background-color: #000;
-            color: #0f0;
-            font-family: 'Courier New', Courier, monospace;
-            overflow: hidden; /* 防止滚动 */
+        /* --- 基础设定 --- */
+        body { 
+            background-color: #020617; color: #fff; margin: 0; overflow-x: hidden; 
+            font-family: 'Noto Serif SC', serif;
+            -webkit-font-smoothing: antialiased;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        /* 居中容器 */
-        .container {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100%;
-            padding: 20px;
-            box-sizing: border-box;
-            text-align: center;
+        /* --- 视觉特效：黑金流光字 --- */
+        .gold-text {
+            background: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
+            -webkit-background-clip: text; background-clip: text; color: transparent;
+            text-shadow: 0 0 30px rgba(251, 191, 36, 0.3);
+            background-size: 200% auto; animation: shine 5s linear infinite;
         }
+        @keyframes shine { to { background-position: 200% center; } }
 
-        /* 1. 信号接入按钮 (初始显示) */
-        #signal-btn {
-            background: transparent;
-            border: 2px solid #0f0;
-            color: #0f0;
-            padding: 15px 30px;
-            font-size: 1.2rem;
-            cursor: pointer;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            box-shadow: 0 0 10px #0f0;
-            transition: all 0.3s ease;
-            animation: pulse 2s infinite;
+        /* --- 开场幕布 --- */
+        #cinema-intro {
+            position: fixed; inset: 0; background: #020617; z-index: 9999;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            padding: 40px; text-align: center; cursor: pointer;
         }
-
-        #signal-btn:hover {
-            background: #0f0;
-            color: #000;
-            box-shadow: 0 0 20px #0f0;
+        .intro-text {
+            font-family: 'Special Elite', monospace; color: #fbbf24; font-size: 1.2rem; line-height: 2;
+            text-shadow: 0 0 10px rgba(251, 191, 36, 0.5); min-height: 180px;
         }
-
-        /* 2. 内容区域 (初始隐藏) */
-        #content-area {
-            display: none; /* 关键：初始不显示 */
-            width: 80%;
-            max-width: 600px;
+        .tap-hint { 
+            margin-top: 40px; opacity: 0; color: #94a3b8; font-size: 0.9rem; 
+            letter-spacing: 2px; text-transform: uppercase; animation: pulse 2s infinite; 
+            border: 1px solid rgba(255,255,255,0.2); padding: 8px 16px; border-radius: 20px;
         }
-
-        /* 打字机文字样式 */
-        #typewriter-text {
-            font-size: 1.2rem;
-            line-height: 1.6;
-            text-shadow: 0 0 5px #0f0;
-            min-height: 100px;
-            text-align: left;
-            margin-bottom: 30px;
+        
+        /* --- 主舞台 --- */
+        #main-stage { opacity: 0; transition: opacity 2s; }
+        #aurora-bg { position: fixed; inset: 0; z-index: -2; opacity: 0.6; pointer-events: none; }
+        
+        /* --- 魔法导航坞 --- */
+        .magic-dock { 
+            position: fixed; right: 20px; top: 50%; transform: translateY(-50%); 
+            display: flex; flex-direction: column; gap: 20px; z-index: 5000; 
         }
-
-        /* 光标闪烁 */
-        .cursor {
-            display: inline-block;
-            width: 10px;
-            height: 1.2rem;
-            background-color: #0f0;
-            animation: blink 1s step-end infinite;
+        .dock-btn {
+            width: 48px; height: 48px; border-radius: 50%; 
+            display: flex; justify-content: center; align-items: center; font-size: 1.5rem;
+            color: #fbbf24; text-decoration: none; transition: all 0.3s;
+            background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(8px);
+            border: 1px solid rgba(251, 191, 36, 0.3); box-shadow: 0 0 15px rgba(0,0,0,0.5);
         }
-
-        /* 导航菜单 (打字结束后显示) */
-        #nav-menu {
-            opacity: 0;
-            transition: opacity 2s ease;
+        .dock-btn:active { transform: scale(0.9); background: rgba(251, 191, 36, 0.2); }
+        
+        /* --- 核心按钮 --- */
+        .hero-btn {
+            position: relative; overflow: hidden;
+            padding: 18px 48px; border-radius: 99px;
+            background: linear-gradient(to bottom, #1e293b, #0f172a);
+            border: 1px solid rgba(251, 191, 36, 0.5);
+            color: #fbbf24; font-family: 'Cinzel', serif; font-weight: bold; font-size: 1.2rem;
+            box-shadow: 0 0 30px rgba(251, 191, 36, 0.15); transition: transform 0.2s;
         }
+        .hero-btn:active { transform: scale(0.95); }
 
-        .nav-btn {
-            display: block;
-            margin: 10px auto;
-            padding: 10px 20px;
-            border: 1px solid #0f0;
-            color: #0f0;
-            text-decoration: none;
-            width: 200px;
-            transition: 0.3s;
-        }
-        .nav-btn:hover { background: rgba(0, 255, 0, 0.2); }
+        /* 底部视频 */
+        .footer { margin-top: 85vh; padding: 50px 20px; background: linear-gradient(to top, #020617 80%, transparent); text-align: center; }
+        .video-box { border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; overflow: hidden; max-width: 500px; margin: 0 auto; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
 
-        /* 动画定义 */
-        @keyframes blink { 50% { opacity: 0; } }
-        @keyframes pulse { 0% { box-shadow: 0 0 5px #0f0; } 50% { box-shadow: 0 0 20px #0f0; } 100% { box-shadow: 0 0 5px #0f0; } }
+        @keyframes pulse { 0%, 100% {opacity: 0.3;} 50% {opacity: 1;} }
+        @keyframes fall { to { transform: translateY(110vh); } }
+        .snowflake { position: absolute; background: white; border-radius: 50%; opacity: 0.8; animation: fall linear infinite; pointer-events: none; }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <button id="signal-btn" onclick="initializeSystem()">[ 点击接入加密频段 ]</button>
+    <div class="magic-dock">
+        <a href="javascript:navTo('certificate.html')" class="dock-btn">📜</a>
+        <a href="javascript:navTo('mission.html')" class="dock-btn">💌</a>
+        <a href="javascript:navTo('magic.html')" class="dock-btn">🎄</a>
+    </div>
 
-        <div id="content-area">
-            <div id="typewriter-text"><span id="text-target"></span><span class="cursor"></span></div>
+    <div id="cinema-intro">
+        <div class="intro-text" id="typewriter-area"></div>
+        <div class="tap-hint" id="tap-hint">👆 点击屏幕 接入信号</div>
+    </div>
+
+    <div id="main-stage">
+        <div id="aurora-bg"></div>
+        <div id="snow-container"></div>
+
+        <div class="fixed inset-0 flex flex-col justify-center items-center pointer-events-none p-6">
+            <h1 class="text-6xl md:text-8xl font-bold mb-4 gold-text" style="font-family: 'Ma Shan Zheng', cursive;">圣诞快乐</h1>
+            <div class="text-sm tracking-[0.5em] text-yellow-100/60 mb-12 font-serif uppercase">The Snowflake Kingdom</div>
             
-            <div id="nav-menu">
-                <a href="magic.html" class="nav-btn">>> 进入魔法空间 <<</a>
-                <a href="mission.html" class="nav-btn">>> 查看绝密任务 <<</a>
+            <button onclick="navTo('certificate.html')" class="hero-btn pointer-events-auto">
+                开启旅程
+            </button>
+        </div>
+
+        <div class="footer">
+            <p class="text-slate-500 text-xs tracking-widest mb-4">ENCRYPTED SIGNAL FROM NORTH POLE</p>
+            <div class="video-box">
+                <video controls playsinline width="100%" poster="poster.jpg">
+                    <source src="santa_video.mp4" type="video/mp4">
+                </video>
             </div>
         </div>
     </div>
 
-    <audio id="bgm" src="audio.mp3" preload="auto"></audio>
+    <script type="module">
+        import { Renderer, Program, Mesh, Color, Triangle } from 'https://cdn.skypack.dev/ogl';
+        
+        // --- 参数解析 ---
+        const params = new URLSearchParams(window.location.search);
+        const name = params.get('name') || '宝贝';
+        const lang = params.get('lang') || 'zh';
 
-    <script>
-        // 配置文案
-        const message = "指挥官，欢迎回来。\n检测到您的生物信号...\n正在建立安全连接...\n所有系统准备就绪。";
-        const speed = 100; // 打字速度 (毫秒)
+        window.navTo = function(page) {
+            window.location.href = `${page}?name=${encodeURIComponent(name)}&lang=${lang}`;
+        }
+
+        // --- 语音合成系统 ---
+        const synth = window.speechSynthesis;
+        function speak(text) {
+            synth.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = lang === 'zh' ? 'zh-CN' : 'en-US';
+            utterance.rate = 0.95; 
+            utterance.pitch = 1.0;
+            synth.speak(utterance);
+        }
+
+        // --- 文本内容 ---
+        const introText = lang === 'zh' 
+            ? `亲爱的 ${name}：\n我是来自北极的信使。\n监测到你在2025年的优异表现，\n特来给你赠送圣诞礼物。\n准备好进入雪花国度了吗？` 
+            : `Dear ${name},\nMessenger from North Pole here.\nWe detected your amazing spirit in 2025!\nA gift awaits you.\nReady to enter the Snowflake Kingdom?`;
+        
+        const audioText = lang === 'zh' 
+            ? `亲爱的${name}，我是来自北极的信使。监测到你在2025年的优异表现，特来给你赠送圣诞礼物。准备好进入雪花国度了吗？`
+            : `Hello ${name}, I am the messenger from the North Pole. Ready for your gift?`;
+
+        // --- 打字机逻辑 ---
+        const typeArea = document.getElementById('typewriter-area');
+        const hint = document.getElementById('tap-hint');
         let i = 0;
         
-        // 系统初始化函数
-        function initializeSystem() {
-            // 1. 隐藏按钮
-            document.getElementById('signal-btn').style.display = 'none';
-            // 2. 显示内容区
-            document.getElementById('content-area').style.display = 'block';
-            // 3. 播放音频 (浏览器策略允许用户交互后播放)
-            const audio = document.getElementById('bgm');
-            if(audio) {
-                audio.volume = 0.5;
-                audio.play().catch(e => console.log("Audio play failed:", e));
-            }
-            // 4. 开始打字
-            typeWriter();
-        }
-
-        // 打字机逻辑
-        function typeWriter() {
-            if (i < message.length) {
-                const char = message.charAt(i);
-                // 处理换行符
-                if (char === '\n') {
-                    document.getElementById("text-target").innerHTML += '<br>';
-                } else {
-                    document.getElementById("text-target").innerHTML += char;
-                }
+        function type() {
+            if (i < introText.length) {
+                const char = introText.charAt(i);
+                typeArea.innerHTML += char === '\n' ? '<br>' : char;
                 i++;
-                setTimeout(typeWriter, speed);
+                setTimeout(type, 80);
             } else {
-                // 打字结束，显示菜单
-                document.getElementById('nav-menu').style.opacity = '1';
+                hint.style.opacity = 1;
             }
         }
+        setTimeout(type, 500);
+
+        // --- 核心交互：点击解锁音频 & 视觉转场 ---
+        document.getElementById('cinema-intro').addEventListener('click', () => {
+            // 1. 解锁 iOS 音频
+            const unlock = new SpeechSynthesisUtterance('');
+            synth.speak(unlock);
+
+            // 2. 播放语音
+            setTimeout(() => {
+                speak(audioText);
+            }, 300);
+
+            // 3. 视觉转场
+            gsap.to("#cinema-intro", { opacity: 0, duration: 1.5, pointerEvents: "none" });
+            gsap.to("#main-stage", { opacity: 1, duration: 1.5, delay: 0.5 });
+            
+            // 4. 启动极光
+            initAurora();
+        });
+
+        // --- 极光特效 (轻量版) ---
+        function initAurora() {
+            const ctn = document.getElementById('aurora-bg');
+            // 防止重复初始化
+            if(ctn.children.length > 0) return;
+            
+            const renderer = new Renderer({alpha:true}); const gl=renderer.gl; ctn.appendChild(gl.canvas);
+            const program = new Program(gl,{
+                vertex: `#version 300 es\nin vec2 position;void main(){gl_Position=vec4(position,0.0,1.0);}`,
+                fragment: `#version 300 es\nprecision highp float;uniform float uTime;uniform vec2 uResolution;out vec4 fragColor;float snoise(vec2 v){return sin(v.x*10.0+uTime)*cos(v.y*10.0+uTime)*0.5+0.5;}void main(){vec2 uv=gl_FragCoord.xy/uResolution;float alpha=smoothstep(0.3,0.7,snoise(uv*1.5)+0.5);fragColor=vec4(0.0,0.8,0.5,1.0)*alpha*0.3;}`,
+                uniforms: { uTime:{value:0}, uResolution:{value:[window.innerWidth, window.innerHeight]} }
+            });
+            const mesh = new Mesh(gl,{geometry:new Triangle(gl),program});
+            function resize(){renderer.setSize(window.innerWidth,window.innerHeight);program.uniforms.uResolution.value=[window.innerWidth,window.innerHeight];}
+            window.addEventListener('resize',resize); resize();
+            requestAnimationFrame(function update(t){program.uniforms.uTime.value=t*0.0005;renderer.render({scene:mesh});requestAnimationFrame(update);});
+        }
+        
+        // --- 雪花特效 ---
+        const snowCtn = document.getElementById('snow-container');
+        setInterval(()=>{
+            if(document.hidden) return; // 页面隐藏时不生成
+            const f=document.createElement('div');f.className='snowflake';
+            const s=Math.random()*3+2+'px';f.style.width=s;f.style.height=s;
+            f.style.left=Math.random()*100+'vw';f.style.animationDuration=Math.random()*5+5+'s';
+            snowCtn.appendChild(f);setTimeout(()=>f.remove(),10000);
+        },200);
     </script>
 </body>
 </html>
