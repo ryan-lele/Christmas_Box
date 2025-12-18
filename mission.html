@@ -3,107 +3,90 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Top Secret Mission</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
+    <title>Secret Mission</title>
+    <script src="https://cdn.bootcdn.net/ajax/libs/tailwindcss/3.3.3/cdn.min.js"></script>
     <style>
-        body { 
-            background-color: #020617; color: #fff; margin: 0; height: 100vh; display: flex; justify-content: center; align-items: center; 
-            font-family: 'Noto Serif SC', serif;
-            /* 扫描线背景 */
-            background-image: 
-                linear-gradient(rgba(15, 23, 42, 0.9) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(15, 23, 42, 0.9) 1px, transparent 1px);
-            background-size: 20px 20px;
-        }
-        
-        .mission-card {
-            background: rgba(15, 23, 42, 0.95);
-            width: 90%; max-width: 400px; padding: 40px 30px;
-            border-radius: 12px;
-            /* 赛博霓虹边框 */
-            border: 2px solid #3b82f6;
-            box-shadow: 0 0 20px rgba(59, 130, 246, 0.5), inset 0 0 20px rgba(59, 130, 246, 0.2);
-            text-align: center; position: relative;
-            overflow: hidden;
-        }
-        
-        /* 扫描动画条 */
+        body { background: #000; color: #0f0; font-family: 'Courier New', monospace; overflow: hidden; }
         .scan-line {
-            position: absolute; top: 0; left: 0; width: 100%; height: 5px;
-            background: #3b82f6;
-            box-shadow: 0 0 10px #3b82f6;
-            animation: scan 3s linear infinite;
-            opacity: 0.5;
+            position: fixed; top: 0; left: 0; width: 100%; height: 5px;
+            background: rgba(0, 255, 0, 0.5); box-shadow: 0 0 10px #0f0;
+            animation: scan 3s infinite linear; pointer-events: none; z-index: 10;
         }
-        @keyframes scan { 0% {top:0;} 100% {top:100%;} }
-
-        .stamp {
-            color: #ef4444; font-size: 1.8rem; letter-spacing: 4px; font-weight: 900; 
-            border: 4px solid #ef4444; padding: 5px 20px; display: inline-block; 
-            transform: rotate(-5deg); margin-bottom: 25px; 
-            text-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
-            box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+        @keyframes scan { 0% {top: -10%} 100% {top: 110%} }
+        
+        .card {
+            border: 1px solid #0f0; background: rgba(0, 20, 0, 0.9);
+            padding: 20px; margin: 20px; max-width: 400px;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.2);
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 85%; text-align: center;
         }
-
-        .icon-anim { font-size: 5rem; color: #fbbf24; margin-bottom: 20px; animation: bounce 2s infinite; filter: drop-shadow(0 0 10px #fbbf24); }
-        @keyframes bounce { 0%, 100% {transform: scale(1);} 50% {transform: scale(1.1);} }
-
-        .action-btn {
-            background: linear-gradient(135deg, #2563eb, #1e40af);
-            color: #fff; border: 1px solid #60a5fa; padding: 18px 30px; border-radius: 8px;
-            font-size: 1.2rem; font-weight: bold; cursor: pointer; margin-top: 30px;
-            box-shadow: 0 0 25px rgba(37, 99, 235, 0.6);
-            width: 100%; text-transform: uppercase; letter-spacing: 2px;
+        .btn {
+            background: #0f0; color: #000; border: none; padding: 10px 30px;
+            font-weight: bold; margin-top: 20px; cursor: pointer;
+            font-family: 'Courier New', monospace;
         }
-        .action-btn:active { transform: scale(0.98); }
-
-        /* 导航 */
-        .magic-dock { position: fixed; right: 20px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 20px; z-index: 5000; }
-        .dock-btn { width: 45px; height: 45px; border-radius: 50%; background: rgba(0,0,0,0.8); border: 1px solid #3b82f6; color: #3b82f6; display: flex; justify-content: center; align-items: center; text-decoration: none; font-size: 1.4rem; }
-        .back-btn { position: fixed; top: 20px; left: 20px; color: #94a3b8; text-decoration: none; display: flex; align-items: center; gap: 5px; }
+        .hidden { display: none; }
+        
+        /* 语音按钮 */
+        .audio-btn {
+            position: absolute; top: 10px; right: 10px;
+            border: 1px solid #0f0; background: rgba(0,255,0,0.1); color: #0f0;
+            font-size: 12px; padding: 5px 10px; cursor: pointer;
+        }
     </style>
 </head>
 <body>
-    <a href="javascript:navTo('index.html')" class="back-btn"><i class="ph-bold ph-arrow-left"></i> 主页</a>
+    <div class="scan-line"></div>
 
-    <div class="magic-dock">
-        <a href="javascript:navTo('certificate.html')" class="dock-btn">📜</a>
-        <a href="javascript:navTo('mission.html')" class="dock-btn">💌</a>
-        <a href="javascript:navTo('magic.html')" class="dock-btn">🎄</a>
+    <div class="card" id="envelope" onclick="openLetter()">
+        <h1 class="text-2xl mb-4">CONFIDENTIAL</h1>
+        <p class="text-sm mb-4">TOP SECRET // EYES ONLY</p>
+        <div class="text-4xl my-6">📩</div>
+        <p class="text-xs blink">TAP TO DECRYPT</p>
     </div>
 
-    <div class="mission-card">
-        <div class="scan-line"></div>
-        <div class="stamp">TOP SECRET</div>
-        <div class="icon-anim"><i class="ph-fill ph-users-three"></i></div>
-        
-        <div style="font-size: 1.3rem; line-height: 1.6; font-weight: bold;">
-            绝密指令：<br>
-            跑去用力抱抱爸爸妈妈<br>并在他们耳边说：
-            <div style="color: #fbbf24; font-size: 2.2rem; margin-top: 15px; font-family: 'Ma Shan Zheng', cursive; text-shadow: 0 0 15px #fbbf24;">“我爱你们！”</div>
-        </div>
-
-        <button class="action-btn" onclick="navTo('magic.html')">
-            任务完成，拿礼物！
-        </button>
+    <div class="card hidden" id="letter">
+        <button class="audio-btn" onclick="playAudio()">🔊 播放指令</button>
+        <h2 class="text-xl mb-4 border-b border-green-500 pb-2">MISSION #2025</h2>
+        <div class="text-left text-sm leading-relaxed space-y-4" id="mission-text"></div>
+        <button class="btn" onclick="acceptMission()">ACCEPT MISSION</button>
     </div>
 
     <script>
         const params = new URLSearchParams(window.location.search);
-        const name = params.get('name') || '宝宝';
-        const lang = params.get('lang') || 'zh';
-
-        window.navTo = function(page) {
-            window.location.href = `${page}?name=${encodeURIComponent(name)}&lang=${lang}`;
-        }
+        const name = params.get('name') || 'Agent';
         
-        setTimeout(() => {
-            const u = new SpeechSynthesisUtterance("绝密任务：跑去用力抱抱爸爸妈妈，并在他们耳边说：我爱你们！完成后，点击蓝色按钮去拿礼物！");
-            u.lang = 'zh-CN'; u.rate = 1;
+        const missionContent = `
+            <p>特工 ${name}：</p>
+            <p>你的圣诞礼物已被锁定在全息空间中。</p>
+            <p><strong>解锁条件：</strong></p>
+            <p>1. 找到你的爸爸妈妈。</p>
+            <p>2. 给他们一个大大的拥抱。</p>
+            <p>3. 对他们说声“我爱你”。</p>
+            <p>完成后，点击下方按钮激活全息投影。</p>
+        `;
+        
+        const speechContent = `特工${name}，你的圣诞礼物已被锁定。解锁条件：找到爸爸妈妈，给他们一个大大的拥抱，并说一声我爱你。完成后，点击按钮激活礼物。`;
+
+        document.getElementById('mission-text').innerHTML = missionContent;
+
+        function playAudio() {
+            window.speechSynthesis.cancel();
+            const u = new SpeechSynthesisUtterance(speechContent);
+            u.lang = 'zh-CN'; u.rate = 1.0;
             window.speechSynthesis.speak(u);
-        }, 500);
+        }
+
+        function openLetter() {
+            document.getElementById('envelope').classList.add('hidden');
+            document.getElementById('letter').classList.remove('hidden');
+            playAudio(); // 自动尝试播放
+        }
+
+        function acceptMission() {
+            window.location.href = `magic.html${window.location.search}`;
+        }
     </script>
 </body>
 </html>
