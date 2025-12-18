@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Magic Gift V9.0 (Debug)</title>
+    <title>Magic Gift V9.1 (Fix)</title>
     <style>
         /* --- 基础风格 (保持项目一致性) --- */
         @font-face { font-family: 'TechMono'; src: local('Courier New'), monospace; }
@@ -14,7 +14,6 @@
         #webcam { position: fixed; top: -2000px; left: -2000px; width: 320px; height: 240px; opacity: 0.01; pointer-events: none; }
 
         /* --- 调试日志面板 (关键！) --- */
-        /* 这个面板会告诉我们到底卡在哪 */
         #debug-log {
             position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
             width: 80%; max-height: 300px; overflow-y: auto;
@@ -48,9 +47,9 @@
     <script type="importmap">
     {
         "imports": {
-            "three": "https://registry.npmmirror.com/three/0.160.0/files/build/three.module.js",
-            "three/addons/": "https://registry.npmmirror.com/three/0.160.0/files/examples/jsm/",
-            "@mediapipe/tasks-vision": "https://registry.npmmirror.com/@mediapipe/tasks-vision/0.10.8/files/+esm"
+            "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/",
+            "@mediapipe/tasks-vision": "https://unpkg.com/@mediapipe/tasks-vision@0.10.8/wasm/vision_bundle.js"
         }
     }
     </script>
@@ -58,11 +57,11 @@
 <body>
 
     <div id="debug-log">
-        <div class="log-line">=== SYSTEM START ===</div>
+        <div class="log-line">=== SYSTEM START V9.1 ===</div>
     </div>
 
     <div class="hud-layer hud-top">
-        <div style="font-size:12px;">● V9.0 DEBUG</div>
+        <div style="font-size:12px;">● V9.1 FIX</div>
         <a href="mission.html" class="back-btn">EXIT</a>
     </div>
 
@@ -86,12 +85,13 @@
         // --- 屏幕日志工具 ---
         function log(msg, isError = false) {
             const box = document.getElementById('debug-log');
+            if (!box) return;
             const line = document.createElement('div');
             line.className = isError ? 'log-line log-err' : 'log-line';
             const time = new Date().toLocaleTimeString();
             line.innerText = `[${time}] ${msg}`;
             box.appendChild(line);
-            box.scrollTop = box.scrollHeight; // 自动滚动到底部
+            box.scrollTop = box.scrollHeight; 
             console.log(msg);
         }
         window.onerror = function(msg) { log("GLOBAL ERROR: " + msg, true); };
@@ -104,21 +104,20 @@
         import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
         import { FilesetResolver, HandLandmarker } from '@mediapipe/tasks-vision';
 
-        // 状态
         let handLandmarker = undefined;
         let video = document.getElementById('webcam');
-        let lastTime = -1;
 
-        // --- 1. 启动顺序 (严格串行，方便排错) ---
+        // --- 1. 启动顺序 ---
         async function init() {
             try {
                 log("1. Init Three.js Scene...");
                 initThree(); 
                 
-                log("2. Loading AI Engine (WASM) from Aliyun...");
-                // 使用阿里云镜像加载引擎
+                log("2. Loading AI Engine (WASM) from unpkg...");
+                
+                // 关键点：明确指定 WASM 文件的加载路径
                 const vision = await FilesetResolver.forVisionTasks(
-                    "https://registry.npmmirror.com/@mediapipe/tasks-vision/0.10.8/files/wasm"
+                    "https://unpkg.com/@mediapipe/tasks-vision@0.10.8/wasm"
                 );
                 log(">> WASM Engine Loaded OK.");
 
@@ -128,7 +127,7 @@
                 // 加载本地模型
                 handLandmarker = await HandLandmarker.createFromOptions(vision, {
                     baseOptions: {
-                        modelAssetPath: "./wasm/hand_landmarker.task", // 必须确保此文件存在！
+                        modelAssetPath: "./wasm/hand_landmarker.task", 
                         delegate: "GPU"
                     },
                     runningMode: "VIDEO",
@@ -157,7 +156,7 @@
         // --- 2. 摄像头 ---
         async function startCamera() {
             if (!navigator.mediaDevices?.getUserMedia) {
-                throw new Error("Browser does not support Camera API (check HTTPS)");
+                throw new Error("No Camera API (check HTTPS)");
             }
             const stream = await navigator.mediaDevices.getUserMedia({
                 video: { facingMode: "user", width: {ideal: 320}, height: {ideal: 240} }
@@ -182,18 +181,14 @@
                         results = handLandmarker.detectForVideo(video, performance.now()); 
                     } catch(e) { console.error(e); }
 
-                    // 绘制调试小窗
                     webcamCtx.drawImage(video, 0, 0, 160, 120);
 
                     if(results && results.landmarks.length > 0) {
                         const lm = results.landmarks[0];
-                        // 绘制骨架
                         webcamCtx.fillStyle = '#00ffea'; 
                         for(let p of lm) { 
                             webcamCtx.beginPath(); webcamCtx.arc(p.x*160, p.y*120, 2, 0, 2*Math.PI); webcamCtx.fill(); 
                         }
-
-                        // 手势逻辑 (原版复刻)
                         processGesture(lm);
                     }
                 }
@@ -204,20 +199,14 @@
             render();
         }
 
-        // --- 4. 手势逻辑 (适配版) ---
         function processGesture(lm) {
             const wrist = lm[0]; 
-            const indexTip = lm[8]; 
             const tips = [lm[8], lm[12], lm[16], lm[20]];
-            
-            // 计算张开程度
             let spread = 0;
             tips.forEach(t => spread += Math.hypot(t.x-wrist.x, t.y-wrist.y));
             spread /= 4;
 
-            const dist = spread; // 简化变量名
-            
-            if (dist > 0.3) {
+            if (spread > 0.3) {
                 document.getElementById('gesture-status').innerText = "✋ OPEN: SCATTER";
                 particles.forEach(p => p.position.lerp(p.userData.scatterPos, 0.08));
             } else {
@@ -227,7 +216,6 @@
             }
         }
 
-        // --- 5. 3D 场景 (保持赛博风格) ---
         let scene, camera, renderer, composer, group;
         const particles = [];
         
@@ -244,7 +232,6 @@
 
             group = new THREE.Group(); scene.add(group);
             
-            // 粒子树
             const geo = new THREE.TetrahedronGeometry(0.5);
             const mat = new THREE.MeshBasicMaterial({color: 0x00ffea, transparent:true, opacity:0.8});
             
