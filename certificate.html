@@ -3,131 +3,100 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Certificate</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
+    <title>Certificate of Excellence</title>
+    <script src="https://cdn.bootcdn.net/ajax/libs/tailwindcss/3.3.3/cdn.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Noto+Serif+SC:wght@700&family=Special+Elite&display=swap" rel="stylesheet">
     <style>
-        body { 
-            background: #000; height: 100vh; display: flex; justify-content: center; align-items: center; margin: 0; 
-            font-family: 'Noto Serif SC', serif; overflow: hidden;
-        }
-        
-        /* --- 羊皮纸系统 --- */
+        body { background: #1a0b00; color: #3e2723; font-family: 'Noto Serif SC', serif; overflow: hidden; }
         .parchment {
-            background-color: #f4e4bc;
-            /* 噪点纹理，无需外部图片 */
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.15'/%3E%3C/svg%3E");
-            width: 90%; max-width: 400px; padding: 40px 25px;
-            border-radius: 4px;
-            /* 边缘发光 + 投影 */
-            box-shadow: 
-                inset 0 0 80px rgba(139, 69, 19, 0.3), /* 内部旧化 */
-                0 0 0 5px #8b0000, /* 红边 */
-                0 0 0 8px #d4af37, /* 金边 */
-                0 20px 60px rgba(0,0,0,0.9); /* 悬浮影 */
-            text-align: center; position: relative;
+            background: url('https://img.freepik.com/free-photo/old-paper-texture_1194-6729.jpg');
+            background-size: cover; box-shadow: 0 0 50px rgba(0,0,0,0.8) inset;
+            position: fixed; inset: 20px; border: 2px solid #b8860b;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            text-align: center; padding: 20px;
         }
-
-        /* 墨水效果 */
-        .ink-text { color: #2c2c2c; mix-blend-mode: multiply; }
-
-        .seal { 
-            width: 90px; height: 90px; background: #8b0000; color: #d4af37; border-radius: 50%; 
-            display: flex; justify-content: center; align-items: center; font-size: 3rem; 
-            border: 3px solid #d4af37; margin: -60px auto 20px; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-            position: relative; z-index: 10;
+        .seal {
+            width: 120px; height: 120px; border: 4px solid #8b0000; border-radius: 50%;
+            color: #8b0000; font-weight: bold; display: flex; align-items: center; justify-content: center;
+            transform: rotate(-15deg) scale(2); opacity: 0; transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            font-family: 'Special Elite', cursive; font-size: 1.2rem;
+            border-style: double; box-shadow: 0 0 0 4px #8b0000 inset;
         }
-        
-        .title { 
-            color: #555; font-size: 1.1rem; letter-spacing: 4px; text-transform: uppercase; 
-            border-bottom: 1px solid #8b0000; display: inline-block; padding-bottom: 5px; margin-bottom: 10px; 
-        }
-        
-        .name { 
-            font-family: 'Ma Shan Zheng', cursive; font-size: 3.8rem; color: #8b0000; 
-            margin: 10px 0 20px; transform: rotate(-3deg); mix-blend-mode: multiply;
-        }
-        
-        .content { 
-            font-size: 1.1rem; line-height: 1.8; color: #1a0505; min-height: 120px; 
-            text-align: justify; font-weight: 600; 
-        }
-        
+        .seal.stamped { opacity: 0.8; transform: rotate(-15deg) scale(1); }
         .next-btn {
-            margin-top: 30px;
-            background: #1a0505; color: #d4af37; border: 1px solid #d4af37;
-            padding: 12px 30px; border-radius: 4px;
-            font-size: 1.1rem; font-family: 'Noto Serif SC', serif;
-            cursor: pointer; opacity: 0; transition: all 0.5s;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            margin-top: 30px; padding: 12px 30px; background: #8b0000; color: #ffd700;
+            border: none; border-radius: 5px; font-family: 'Cinzel', serif; font-size: 1.1rem;
+            opacity: 0; pointer-events: none; transition: opacity 1s;
         }
-        .next-btn.show { opacity: 1; }
-
-        /* 导航 */
-        .magic-dock { position: fixed; right: 20px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 20px; z-index: 5000; }
-        .dock-btn { width: 45px; height: 45px; border-radius: 50%; background: rgba(0,0,0,0.6); border: 1px solid #fbbf24; color: #fbbf24; display: flex; justify-content: center; align-items: center; text-decoration: none; font-size: 1.4rem; }
-        .back-btn { position: fixed; top: 20px; left: 20px; color: #fff; text-decoration: none; display: flex; align-items: center; gap: 5px; opacity: 0.5; }
+        /* 新增：朗读按钮 */
+        .audio-btn {
+            position: absolute; top: 20px; right: 20px;
+            background: rgba(139, 0, 0, 0.1); border: 1px solid #8b0000; color: #8b0000;
+            padding: 8px 15px; border-radius: 20px; font-weight: bold; font-size: 0.9rem;
+            cursor: pointer; z-index: 50; display: flex; align-items: center; gap: 5px;
+        }
+        .audio-btn:active { background: rgba(139, 0, 0, 0.3); }
     </style>
 </head>
 <body>
-    <a href="javascript:navTo('index.html')" class="back-btn"><i class="ph-bold ph-arrow-left"></i> 主页</a>
+    <div class="parchment" id="paper">
+        <button class="audio-btn" onclick="playAudio()">🔊 朗读证书</button>
 
-    <div class="magic-dock">
-        <a href="javascript:navTo('certificate.html')" class="dock-btn">📜</a>
-        <a href="javascript:navTo('mission.html')" class="dock-btn">💌</a>
-        <a href="javascript:navTo('magic.html')" class="dock-btn">🎄</a>
-    </div>
-
-    <div class="parchment">
-        <div class="seal"><i class="ph-fill ph-check"></i></div>
-        <div class="title ink-text">官方认证</div>
-        <div class="name" id="childName"></div>
-        <div class="content ink-text" id="typewriter"></div>
+        <h1 class="text-3xl mb-2 font-bold text-yellow-900" style="font-family: 'Cinzel'">好孩子证书</h1>
+        <div class="w-full h-1 bg-yellow-900 mb-6 opacity-50"></div>
         
-        <button class="next-btn" id="nextBtn" onclick="navTo('mission.html')">
-            接受绝密任务
-        </button>
+        <p class="text-lg mb-4">兹证明</p>
+        <h2 class="text-4xl mb-6 font-bold text-red-900" id="child-name"></h2>
+        <p class="text-md leading-relaxed mb-8 px-4">
+            在2025年度表现优异<br>
+            诚实勇敢，充满爱心<br>
+            经北极精灵委员会审核<br>
+            特颁发此证
+        </p>
+
+        <div class="seal" id="seal">OFFICIAL<br>NORTH POLE<br>APPROVED</div>
+        
+        <button class="next-btn" id="btn-next" onclick="goNext()">接受任务 (Accept Mission)</button>
     </div>
 
     <script>
         const params = new URLSearchParams(window.location.search);
-        const name = params.get('name') || '宝宝';
-        const lang = params.get('lang') || 'zh';
-        document.getElementById('childName').innerText = name;
+        const name = params.get('name') || '宝贝';
+        document.getElementById('child-name').innerText = name;
 
-        window.navTo = function(page) {
-            window.location.href = `${page}?name=${encodeURIComponent(name)}&lang=${lang}`;
-        }
+        const speechText = `祝贺你，${name}。这是你的好孩子证书。北极委员会已经批准了你的礼物申请。现在，请点击按钮，接受你的秘密任务。`;
 
-        const textCN = `经北极精灵事务部审核：虽然你今年偶尔会发点小脾气，或者不爱收拾玩具，但你拥有一颗非常善良的心。判定结果：2025年度超级好孩子！`;
-        const textEN = `North Pole Audit: Although slightly naughty at times, you have a heart of gold. Verdict: Super Good Child of 2025!`;
-        
-        const finalTxt = lang === 'zh' ? textCN : textEN;
-        const container = document.getElementById('typewriter');
-        
-        // 语音
-        setTimeout(() => {
-            const u = new SpeechSynthesisUtterance(finalTxt);
-            u.lang = lang === 'zh' ? 'zh-CN' : 'en-US';
-            u.rate = 0.95; 
+        // 核心：手动播放
+        function playAudio() {
+            window.speechSynthesis.cancel();
+            const u = new SpeechSynthesisUtterance(speechText);
+            u.lang = 'zh-CN'; u.rate = 1.0;
             window.speechSynthesis.speak(u);
-        }, 800);
-
-        // 打字机
-        let i = 0;
-        function type() {
-            if (i < finalTxt.length) {
-                container.innerHTML += finalTxt.charAt(i);
-                i++;
-                setTimeout(type, 80);
-            } else {
-                document.getElementById('nextBtn').classList.add('show');
-            }
         }
-        setTimeout(type, 800);
-        setTimeout(() => document.getElementById('nextBtn').classList.add('show'), 5000);
+
+        // 盖章逻辑
+        let stamped = false;
+        document.body.addEventListener('click', (e) => {
+            // 如果点的是朗读按钮，不触发盖章
+            if (e.target.closest('.audio-btn')) return;
+            
+            if (stamped) return;
+            stamped = true;
+            document.getElementById('seal').classList.add('stamped');
+            
+            // 自动尝播放一次，如果失败用户可以点按钮
+            playAudio();
+
+            setTimeout(() => {
+                const btn = document.getElementById('btn-next');
+                btn.style.opacity = 1;
+                btn.style.pointerEvents = 'auto';
+            }, 1000);
+        });
+
+        window.goNext = function() {
+            window.location.href = `mission.html${window.location.search}`;
+        }
     </script>
 </body>
 </html>
