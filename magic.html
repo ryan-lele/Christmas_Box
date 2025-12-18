@@ -3,52 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Hologram V6.0 Turbo</title>
+    <title>Magic Gift V7.0 (CDN)</title>
     
     <style>
-        /* --- 极简基础样式 --- */
-        @font-face { font-family: 'TechMono'; src: local('Courier New'), local('Consolas'), monospace; }
-        body { margin: 0; background: #000; overflow: hidden; font-family: 'TechMono', monospace; color: #00ffea; }
-        
-        /* 强制视频解码 hack (iOS必须) */
-        #webcam { position: fixed; top: -2000px; left: -2000px; width: 320px; height: 240px; opacity: 0.01; pointer-events: none; }
+        @font-face { font-family: 'TechMono'; src: local('Courier New'), monospace; }
+        body { margin: 0; background: #000; overflow: hidden; font-family: 'TechMono'; color: #00ffea; }
         
         #hologram-canvas { position: absolute; inset: 0; z-index: 1; }
         
-        /* --- 加载遮罩 (极速版) --- */
+        /* 强制视频解码 hack (iOS 必须) */
+        #webcam { position: fixed; top: -2000px; left: -2000px; width: 320px; height: 240px; opacity: 0.01; pointer-events: none; }
+
+        /* --- 加载界面 --- */
         #loading-screen {
             position: fixed; inset: 0; background: #000; z-index: 9999;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             transition: opacity 0.5s;
         }
-        .loader-bar-bg {
-            width: 200px; height: 4px; background: #333; border-radius: 2px; margin-top: 20px; overflow: hidden;
+        .loader-ring {
+            width: 60px; height: 60px; border: 4px solid #333; border-top: 4px solid #00ffea;
+            border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px;
         }
-        .loader-bar-fill {
-            width: 0%; height: 100%; background: #00ffea; box-shadow: 0 0 10px #00ffea;
-            transition: width 0.3s; animation: shimmy 2s infinite linear;
+        .loading-text { color: #00ffea; font-size: 12px; letter-spacing: 2px; }
+        @keyframes spin { 0% {transform: rotate(0deg);} 100% {transform: rotate(360deg);} }
+
+        /* UI */
+        .hud-layer { position: absolute; width: 100%; pointer-events: none; padding: 15px; box-sizing: border-box; }
+        .hud-top { top: 0; display: flex; justify-content: space-between; z-index: 20; }
+        .back-btn { pointer-events: auto; color: #00ffea; border: 1px solid #00ffea; padding: 5px 12px; text-decoration: none; font-size: 12px; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); }
+        
+        #gesture-status { 
+            position: absolute; bottom: 80px; left: 0; width: 100%; text-align: center; 
+            font-size: 12px; color: #fff; text-shadow: 0 0 5px cyan; opacity: 0.8; z-index: 10;
         }
-        @keyframes shimmy { 0% {filter: hue-rotate(0deg);} 100% {filter: hue-rotate(360deg);} }
         
-        /* --- HUD 界面 --- */
-        .hud-layer { position: absolute; z-index: 20; width: 100%; pointer-events: none; padding: 20px; box-sizing: border-box; }
-        .hud-top { top: 0; display: flex; justify-content: space-between; border-bottom: 1px solid rgba(0,255,234,0.3); padding-bottom: 15px; background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent); }
-        .hud-bottom { bottom: 0; text-align: center; padding-bottom: 40px; background: linear-gradient(to top, rgba(0,0,0,0.9), transparent); }
-        
-        .back-btn { pointer-events: auto; color: #00ffea; border: 1px solid #00ffea; padding: 8px 15px; text-decoration: none; font-size: 12px; background: rgba(0,20,20,0.8); }
-        
-        #gesture-status { color: #fff; font-size: 10px; margin-top: 5px; opacity: 0.8; }
-        
-        /* 装饰按钮 */
-        .left-dock { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 15px; pointer-events: auto; z-index: 30; }
+        /* 装饰坞 */
+        .left-dock { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 10px; pointer-events: auto; z-index: 30; }
         .deco-btn { width: 40px; height: 40px; border-radius: 50%; border: 1px solid rgba(0,255,234,0.3); background: rgba(0,0,0,0.5); color: #00ffea; font-size: 18px; display: flex; justify-content: center; align-items: center; cursor: pointer; }
         
-        /* 小窗调试 */
-        #webcam-wrapper { position: absolute; bottom: 130px; right: 20px; width: 100px; height: 75px; border: 1px solid #00ffea; opacity: 0.7; transform: scaleX(-1); z-index: 10; background: #000; }
-        #webcam-preview { width: 100%; height: 100%; object-fit: cover; }
-        
+        /* 拍照上传 */
+        .bottom-dock { position: absolute; bottom: 20px; width: 100%; text-align: center; pointer-events: auto; z-index: 30; }
+        .upload-btn { border: 1px solid #00ffea; padding: 10px 30px; color: #00ffea; background: rgba(0,50,50,0.5); font-size: 12px; border-radius: 20px; display: inline-block;}
         #file-input { display: none; }
-        .upload-btn { pointer-events: auto; border: 1px solid #00ffea; padding: 10px 30px; color: #00ffea; background: rgba(0,50,50,0.5); font-size: 12px; }
+        
+        #webcam-preview { position: absolute; top: 10px; right: 10px; width: 80px; height: 60px; border: 1px solid #333; opacity: 0; z-index: 5; transform: scaleX(-1); transition: opacity 0.5s; }
     </style>
 
     <script type="importmap">
@@ -64,30 +62,29 @@
 <body>
 
     <div id="loading-screen">
-        <div style="font-size: 20px; letter-spacing: 3px; text-shadow: 0 0 10px #00ffea;">HOLOGRAM LOADING</div>
-        <div class="loader-bar-bg"><div class="loader-bar-fill" id="progress-bar"></div></div>
-        <div id="loading-text" style="margin-top: 10px; font-size: 10px; color: #666;">Connecting to Satellite...</div>
+        <div class="loader-ring"></div>
+        <div class="loading-text" id="loading-msg">CONNECTING...</div>
     </div>
 
     <div class="hud-layer hud-top">
-        <span>● HOLOGRAM v6.0</span>
+        <div style="font-size:12px;">● LIVE</div>
         <a href="mission.html" class="back-btn">EXIT</a>
     </div>
 
     <canvas id="hologram-canvas"></canvas>
-
+    
     <div class="left-dock">
         <div class="deco-btn" onclick="addDeco('STAR')">★</div>
         <div class="deco-btn" onclick="addDeco('GIFT')">🎁</div>
         <div class="deco-btn" onclick="addDeco('SOCK')">🧦</div>
     </div>
 
-    <div id="webcam-wrapper"><canvas id="webcam-preview"></canvas></div>
+    <div id="gesture-status">INITIALIZING...</div>
+    <canvas id="webcam-preview"></canvas>
     <video id="webcam" autoplay playsinline muted></video>
 
-    <div class="hud-layer hud-bottom">
-        <label class="upload-btn">📷 UPLOAD MEMORY<input type="file" id="file-input" multiple accept="image/*"></label>
-        <div id="gesture-status">WAITING FOR CAMERA...</div>
+    <div class="bottom-dock">
+        <label class="upload-btn">📷 UPLOAD PHOTO<input type="file" id="file-input" multiple accept="image/*"></label>
     </div>
 
     <script type="module">
@@ -97,82 +94,74 @@
         import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
         import { FilesetResolver, HandLandmarker } from '@mediapipe/tasks-vision';
 
-        // UI refs
-        const loadingScreen = document.getElementById('loading-screen');
-        const progressBar = document.getElementById('progress-bar');
-        const loadText = document.getElementById('loading-text');
-        
-        // State
+        // 状态
         let handLandmarker = undefined;
         let video = document.getElementById('webcam');
-        let lastVideoTime = -1;
+        let aiReady = false;
         
-        // 伪进度条 (心理学优化)
-        let progress = 0;
-        const fakeProgress = setInterval(() => {
-            if(progress < 90) {
-                progress += Math.random() * 5;
-                progressBar.style.width = progress + '%';
-            }
-        }, 200);
-
-        // --- 1. 极速初始化 ---
-        async function launchSystem() {
+        // --- 1. 极速启动 (并行) ---
+        async function launch() {
             try {
-                loadText.innerText = "Downloading Engine (CDN)...";
+                // 立即启动3D背景，不要等AI
+                initThree(); 
                 
-                // 并行任务：请求摄像头 + 下载模型
-                const cameraTask = startCamera();
-                const aiTask = loadAI();
+                document.getElementById('loading-msg').innerText = "REQUESTING CAMERA...";
+                const cameraPromise = startCamera(); // 请求摄像头
                 
-                await Promise.all([cameraTask, aiTask]);
-                
-                // 完成
-                clearInterval(fakeProgress);
-                progressBar.style.width = '100%';
-                loadText.innerText = "READY!";
-                
-                setTimeout(() => {
-                    loadingScreen.style.opacity = 0;
-                    setTimeout(() => loadingScreen.remove(), 500);
-                    startLoop(); // 启动渲染循环
-                }, 500);
+                document.getElementById('loading-msg').innerText = "DOWNLOADING AI (1MB)...";
+                const aiPromise = loadAI(); // 下载AI (CDN)
 
-            } catch (error) {
-                loadText.innerText = "ERROR: " + error.message;
-                loadText.style.color = "red";
-                console.error(error);
+                // 只要摄像头好了，就先让用户玩
+                await cameraPromise;
+                
+                // 隐藏加载层
+                const loader = document.getElementById('loading-screen');
+                loader.style.opacity = 0;
+                setTimeout(()=>loader.remove(), 500);
+                
+                startLoop();
+
+                // AI 后台加载完毕
+                aiPromise.then(() => {
+                    aiReady = true;
+                    document.getElementById('gesture-status').innerText = "HAND TRACKING ACTIVE";
+                });
+
+            } catch (e) {
+                console.error(e);
+                document.getElementById('loading-msg').innerText = "ERROR: " + e.message;
             }
         }
 
-        // --- 2. 摄像头启动 (带 iOS 修复) ---
+        // --- 2. 摄像头 (iOS 兼容) ---
         async function startCamera() {
-            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                throw new Error("No Camera API");
+            if (!navigator.mediaDevices?.getUserMedia) return false;
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: "user", width: {ideal: 320}, height: {ideal: 240} }
+                });
+                video.srcObject = stream;
+                return new Promise(r => {
+                    video.onloadedmetadata = () => { video.play(); r(true); };
+                });
+            } catch(e) {
+                console.warn("Camera denied");
+                document.getElementById('gesture-status').innerText = "CAMERA DENIED - AUTO MODE";
+                return false;
             }
-            const stream = await navigator.mediaDevices.getUserMedia({
-                video: { facingMode: "user", width: {ideal: 320}, height: {ideal: 240} }
-            });
-            video.srcObject = stream;
-            return new Promise((resolve) => {
-                video.onloadedmetadata = () => {
-                    video.play();
-                    resolve();
-                };
-            });
         }
 
-        // --- 3. AI 加载 (CDN + 本地 Lite) ---
+        // --- 3. AI 加载 (纯 CDN 方案) ---
         async function loadAI() {
-            // 使用 jsDelivr 极速加载 WASM 引擎
+            // 引擎
             const vision = await FilesetResolver.forVisionTasks(
                 "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.8/wasm"
             );
-            
-            // 加载本地的 Lite 模型 (确保您已上传了那个 1MB 的文件)
+            // 模型：直接使用 Google 官方存储桶的 Lite 模型 (CDN)
+            // 这样就不需要从你的 Netlify 下载了，速度极快
             handLandmarker = await HandLandmarker.createFromOptions(vision, {
                 baseOptions: {
-                    modelAssetPath: "./wasm/hand_landmarker.task", 
+                    modelAssetPath: "https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task",
                     delegate: "GPU"
                 },
                 runningMode: "VIDEO",
@@ -180,40 +169,48 @@
             });
         }
 
-        // --- 4. Three.js 渲染逻辑 (精简版但功能完整) ---
-        // (为了确保代码不超长且无 bug，这里使用了最稳定的渲染核心)
-        const scene = new THREE.Scene(); 
-        const camera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 0.1, 1000);
-        camera.position.set(0, 5, 40);
-        const renderer = new THREE.WebGLRenderer({canvas: document.getElementById('hologram-canvas'), alpha:true});
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        const composer = new EffectComposer(renderer);
-        composer.addPass(new RenderPass(scene, camera));
-        composer.addPass(new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.5, 0.4, 0.85));
-
-        const group = new THREE.Group(); scene.add(group);
-        
-        // 造树
+        // --- 4. 3D 渲染 (精简稳定版) ---
+        let scene, camera, renderer, composer, group;
         const particles = [];
-        const geo = new THREE.TetrahedronGeometry(0.5);
-        const mat = new THREE.MeshBasicMaterial({color: 0x00ffea});
-        for(let i=0; i<800; i++) {
-            const mesh = new THREE.Mesh(geo, mat);
-            const t = Math.random(); const y = t*30 - 15; const r = (1-t)*10; const a = Math.random()*6.28;
-            mesh.position.set(Math.cos(a)*r, y, Math.sin(a)*r);
-            mesh.userData = { 
-                basePos: mesh.position.clone(),
-                scatterPos: new THREE.Vector3((Math.random()-0.5)*50, (Math.random()-0.5)*50, (Math.random()-0.5)*50)
-            };
-            group.add(mesh);
-            particles.push(mesh);
+        
+        function initThree() {
+            scene = new THREE.Scene(); 
+            camera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 0.1, 1000);
+            camera.position.set(0, 6, 45);
+            renderer = new THREE.WebGLRenderer({canvas: document.getElementById('hologram-canvas'), alpha:true});
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            
+            const rp = new RenderPass(scene, camera);
+            const bp = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.5, 0.6, 0.85);
+            composer = new EffectComposer(renderer); composer.addPass(rp); composer.addPass(bp);
+
+            group = new THREE.Group(); scene.add(group);
+            
+            // 造树
+            const geo = new THREE.TetrahedronGeometry(0.5);
+            const mat = new THREE.MeshBasicMaterial({color: 0x00ffea, transparent:true, opacity:0.8});
+            
+            for(let i=0; i<900; i++) {
+                const mesh = new THREE.Mesh(geo, mat);
+                const t = Math.random(); const y = t*30 - 15; const r = (1-t)*10; const a = Math.random()*6.28;
+                mesh.position.set(Math.cos(a)*r, y, Math.sin(a)*r);
+                mesh.userData = { 
+                    basePos: mesh.position.clone(),
+                    scatterPos: new THREE.Vector3((Math.random()-0.5)*60, (Math.random()-0.5)*60, (Math.random()-0.5)*60),
+                };
+                group.add(mesh); particles.push(mesh);
+            }
+            
+            // 灯光
+            const light = new THREE.PointLight(0x00ffff, 1, 100); light.position.set(10, 10, 10); scene.add(light);
+            scene.add(new THREE.AmbientLight(0xffffff, 0.5));
         }
 
-        // 装饰功能
         window.addDeco = (type) => {
-            const d = new THREE.Mesh(new THREE.SphereGeometry(1), new THREE.MeshBasicMaterial({color:0xff0000}));
-            d.position.set((Math.random()-0.5)*10, Math.random()*10, 5);
-            group.add(d);
+            const colors = {STAR:0xffff00, GIFT:0xff0000, SOCK:0x00ff00, APPLE:0xff0000, BAUBLE:0x0000ff};
+            const m = new THREE.Mesh(new THREE.SphereGeometry(1), new THREE.MeshBasicMaterial({color: colors[type] || 0xffffff}));
+            m.position.set((Math.random()-0.5)*15, Math.random()*20-5, 8);
+            group.add(m);
         }
 
         // 循环
@@ -223,34 +220,35 @@
 
         function startLoop() {
             function render() {
-                // AI 预测
-                if (video.readyState >= 2 && handLandmarker) {
-                    let results = handLandmarker.detectForVideo(video, performance.now());
+                let handDetected = false;
+                
+                // 只有当 AI 下载完毕 (aiReady=true) 且视频在播放时才检测
+                if (aiReady && video.readyState >= 2) {
+                    let results;
+                    try { results = handLandmarker.detectForVideo(video, performance.now()); } catch(e){}
                     
-                    // 调试窗口
-                    webcamCtx.drawImage(video, 0, 0, 160, 120);
+                    webcamCtx.drawImage(video, 0, 0, 160, 120); // 调试画面
                     
-                    if(results.landmarks.length > 0) {
+                    if(results && results.landmarks.length > 0) {
+                        handDetected = true;
                         const lm = results.landmarks[0];
-                        // 简单手势：判断张开还是握拳
-                        const wrist = lm[0]; const tip = lm[12]; // 中指
+                        const wrist = lm[0]; const tip = lm[12]; 
                         const dist = Math.hypot(tip.x-wrist.x, tip.y-wrist.y);
                         
-                        document.getElementById('gesture-status').innerText = dist > 0.3 ? "HAND: OPEN (SCATTER)" : "HAND: CLOSED (SPIN)";
+                        document.getElementById('gesture-status').innerText = dist > 0.3 ? "✋ OPEN: SCATTER" : "✊ FIST: SPIN";
                         
                         if (dist > 0.3) {
-                            // 散开
-                            particles.forEach(p => p.position.lerp(p.userData.scatterPos, 0.1));
+                            particles.forEach(p => p.position.lerp(p.userData.scatterPos, 0.08));
                         } else {
-                            // 还原 + 旋转
                             particles.forEach(p => p.position.lerp(p.userData.basePos, 0.1));
-                            group.rotation.y += 0.05;
+                            group.rotation.y += 0.1;
                         }
-                    } else {
-                        document.getElementById('gesture-status').innerText = "NO HAND DETECTED";
-                        group.rotation.y += 0.01; // 自动旋转
-                        particles.forEach(p => p.position.lerp(p.userData.basePos, 0.05));
                     }
+                }
+
+                if (!handDetected) {
+                    group.rotation.y += 0.005; // 自动慢旋转
+                    particles.forEach(p => p.position.lerp(p.userData.basePos, 0.05));
                 }
                 
                 composer.render();
@@ -258,22 +256,32 @@
             }
             render();
         }
+        
+        // 调试开关
+        document.addEventListener('click', (e) => {
+            if(e.clientY < 50 && e.clientX > window.innerWidth - 50) {
+                document.getElementById('webcam-preview').style.opacity = 
+                    document.getElementById('webcam-preview').style.opacity == 1 ? 0 : 1;
+            }
+        });
 
-        // 上传照片逻辑
-        document.getElementById('file-input').addEventListener('change', (e) => {
+        // 图片上传
+        const fileInput = document.getElementById('file-input');
+        fileInput.addEventListener('change', (e) => {
             if(e.target.files[0]) {
                 const reader = new FileReader();
                 reader.onload = (ev) => {
                     const tex = new THREE.TextureLoader().load(ev.target.result);
-                    const photo = new THREE.Mesh(new THREE.PlaneGeometry(5,5), new THREE.MeshBasicMaterial({map:tex}));
+                    const photo = new THREE.Mesh(new THREE.PlaneGeometry(5,5*0.75), new THREE.MeshBasicMaterial({map:tex, side:THREE.DoubleSide}));
+                    photo.position.z = 10;
                     group.add(photo);
+                    alert("Photo Added! Use hand to rotate.");
                 };
                 reader.readAsDataURL(e.target.files[0]);
             }
         });
 
-        // 启动
-        launchSystem();
+        launch();
     </script>
 </body>
 </html>
