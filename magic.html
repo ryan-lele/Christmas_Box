@@ -3,60 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Magic Gift V14.0 (Aliyun Speed)</title>
+    <title>Magic Gift V15.0 (Audio Fix)</title>
     
     <style>
-        /* --- 视觉基调 --- */
         body { margin: 0; overflow: hidden; background: radial-gradient(circle at center, #001020 0%, #000000 100%); touch-action: none; font-family: 'Courier New', sans-serif; -webkit-user-select: none; user-select: none; }
-        
-        #canvas-container { width: 100vw; height: 100vh; position: absolute; top: 0; left: 0; z-index: 1; }
+        #canvas-container { position: absolute; inset: 0; z-index: 1; }
         #ui-layer { position: absolute; inset: 0; z-index: 10; pointer-events: none; }
         
-        h1 { 
-            position: absolute; top: 8%; width: 100%; text-align: center;
-            color: #e0f7fa; font-size: 28px; font-weight: 100; margin: 0;
-            letter-spacing: 3px; text-shadow: 0 0 10px #00bfff; opacity: 0.9;
-            font-family: serif;
-        }
-
-        /* 侧边栏 */
-        .left-panel {
-            position: absolute; left: 15px; top: 50%; transform: translateY(-50%);
-            display: flex; flex-direction: column; gap: 15px; pointer-events: auto;
-        }
-        .deco-btn {
-            width: 44px; height: 44px; border-radius: 50%;
-            background: rgba(0, 20, 40, 0.6); border: 1px solid rgba(135, 206, 250, 0.4);
-            color: #fff; font-size: 22px; cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
-            backdrop-filter: blur(4px); transition: transform 0.1s;
-            box-shadow: 0 0 10px rgba(0,0,0,0.5);
-        }
-        .deco-btn:active { transform: scale(0.9); background: #00bfff; }
-
-        /* 底部 */
-        .bottom-panel {
-            position: absolute; bottom: max(30px, env(safe-area-inset-bottom)); width: 100%; text-align: center;
-            pointer-events: auto; display: flex; flex-direction: column; align-items: center; gap: 12px;
-        }
-        .btn-photo {
-            background: rgba(0, 80, 200, 0.4); border: 1px solid #87cefa;
-            color: #e0ffff; padding: 10px 30px; border-radius: 30px;
-            font-size: 14px; font-weight: bold; backdrop-filter: blur(5px);
-            box-shadow: 0 0 15px rgba(0,191,255,0.3); display: inline-block;
-        }
-        #file-input { display: none; }
-        
-        .instruction {
-            font-size: 12px; color: #aaddee; background: rgba(0,0,0,0.6); 
-            padding: 6px 16px; border-radius: 15px; pointer-events: none;
-            text-shadow: 0 0 5px #00bfff; letter-spacing: 1px;
-        }
-
-        /* 顶部返回 */
-        .top-right { position: absolute; top: 20px; right: 20px; pointer-events: auto; }
-        .back-link { color: #87cefa; text-decoration: none; font-size: 12px; border: 1px solid #87cefa; padding: 5px 10px; background: rgba(0,0,0,0.5); backdrop-filter: blur(2px); }
-
         /* 启动遮罩 */
         #start-overlay {
             position: fixed; inset: 0; background: rgba(0,5,10,0.98); z-index: 999;
@@ -70,17 +23,21 @@
         }
         @keyframes pulse { 50% { box-shadow: 0 0 40px #00bfff; } }
 
-        /* 闪白特效 */
+        /* UI 元素 */
+        h1 { position: absolute; top: 8%; width: 100%; text-align: center; color: #e0f7fa; font-size: 28px; text-shadow: 0 0 10px #00bfff; opacity: 0.9; margin: 0; }
+        .left-panel { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 15px; pointer-events: auto; }
+        .deco-btn { width: 44px; height: 44px; border-radius: 50%; background: rgba(0, 20, 40, 0.6); border: 1px solid rgba(135, 206, 250, 0.4); color: #fff; font-size: 22px; display: flex; justify-content: center; align-items: center; cursor: pointer; }
+        .bottom-panel { position: absolute; bottom: max(30px, env(safe-area-inset-bottom)); width: 100%; text-align: center; pointer-events: auto; display: flex; flex-direction: column; gap: 12px; align-items: center;}
+        .btn-photo { background: rgba(0, 80, 200, 0.4); border: 1px solid #87cefa; color: #e0ffff; padding: 10px 30px; border-radius: 30px; font-weight: bold; display: inline-block; }
+        .instruction { font-size: 12px; color: #aaddee; background: rgba(0,0,0,0.6); padding: 6px 16px; border-radius: 15px; }
+        #file-input { display: none; }
         #flash-fx { position: fixed; inset:0; background: #fff; opacity:0; pointer-events:none; z-index:20; transition: opacity 0.2s; }
+        .top-right { position: absolute; top: 20px; right: 20px; pointer-events: auto; }
+        .back-link { color: #87cefa; text-decoration: none; font-size: 12px; border: 1px solid #87cefa; padding: 5px 10px; background: rgba(0,0,0,0.5); }
     </style>
 
     <script type="importmap">
-    {
-        "imports": {
-            "three": "https://registry.npmmirror.com/three/0.160.0/files/build/three.module.js",
-            "three/addons/": "https://registry.npmmirror.com/three/0.160.0/files/examples/jsm/"
-        }
-    }
+    { "imports": { "three": "https://registry.npmmirror.com/three/0.160.0/files/build/three.module.js", "three/addons/": "https://registry.npmmirror.com/three/0.160.0/files/examples/jsm/" } }
     </script>
 </head>
 <body>
@@ -90,14 +47,14 @@
 
     <div id="start-overlay">
         <h2 style="color:#e0ffff; margin-bottom:30px; font-family:serif; letter-spacing:2px;">THE FROZEN GIFT</h2>
-        <button class="start-btn" id="btn-start">❄️ 开启魔法 ❄️</button>
-        <p style="color:#557799; font-size:12px; margin-top:20px;">Aliyun Acceleration Active</p>
+        <button class="start-btn" id="btn-start">❄️ 点击开启声音 ❄️</button>
+        <p style="color:#557799; font-size:12px; margin-top:20px;">Sound & Gyroscope Required</p>
     </div>
 
     <div id="ui-layer">
         <h1>Merry Christmas</h1>
         <div class="top-right"><a href="mission.html" class="back-link">EXIT</a></div>
-
+        
         <div class="left-panel">
             <div class="deco-btn" onclick="addDeco('STAR'); playSound('ding')">★</div>
             <div class="deco-btn" onclick="addDeco('GIFT'); playSound('pop')">🎁</div>
@@ -119,59 +76,79 @@
 
         const STATE = { mode: 'TREE', gyro: { x: 0, y: 0 }, autoRotate: true, blizzardIntensity: 0 };
         const CONFIG = { tree: { count: 1600, height: 26, radius: 9 } };
-
-        let scene, camera, renderer, composer;
-        let mainGroup, treeGroup, photoGroup, snowSystem;
-        let particles = [], flyingObjects = []; 
-        let clock = new THREE.Clock();
-        let textures = {}; 
+        let scene, camera, renderer, composer, mainGroup, treeGroup, photoGroup, snowSystem;
+        let particles = [], flyingObjects = [], clock = new THREE.Clock(), textures = {}; 
         let audioCtx = null;
 
-        // --- 0. 音频 ---
+        // --- 音频增强版 ---
         function initAudio() {
             try {
                 const AudioContext = window.AudioContext || window.webkitAudioContext;
                 audioCtx = new AudioContext();
-                const b = audioCtx.createBuffer(1, 1, 22050);
-                const s = audioCtx.createBufferSource(); s.buffer = b; s.connect(audioCtx.destination); s.start(0);
-            } catch(e) {}
+                
+                // 关键：强制恢复 AudioContext (iOS 修复)
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+
+                // 播放无声缓冲，打通通道
+                const buffer = audioCtx.createBuffer(1, 1, 22050);
+                const source = audioCtx.createBufferSource();
+                source.buffer = buffer;
+                source.connect(audioCtx.destination);
+                source.start(0);
+                console.log("Audio System Init: OK");
+            } catch(e) { console.error("Audio Init Failed", e); }
         }
+
         function playSound(type) {
             if(!audioCtx) return;
+            if(audioCtx.state === 'suspended') audioCtx.resume(); // 双重保险
+
             const now = audioCtx.currentTime;
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             osc.connect(gain); gain.connect(audioCtx.destination);
 
             if (type === 'ding') {
-                osc.type = 'sine'; osc.frequency.setValueAtTime(880, now); osc.frequency.exponentialRampToValueAtTime(100, now + 0.5);
-                gain.gain.setValueAtTime(0.3, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
-                osc.start(now); osc.stop(now + 0.5);
+                osc.type = 'sine'; osc.frequency.setValueAtTime(880, now); osc.frequency.exponentialRampToValueAtTime(100, now + 0.6);
+                gain.gain.setValueAtTime(0.5, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.6);
+                osc.start(now); osc.stop(now + 0.6);
             } else if (type === 'bell') {
-                osc.type = 'triangle'; osc.frequency.setValueAtTime(1500, now);
-                gain.gain.setValueAtTime(0.2, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 1.0);
-                osc.start(now); osc.stop(now + 1.0);
+                osc.type = 'triangle'; osc.frequency.setValueAtTime(2000, now);
+                gain.gain.setValueAtTime(0.3, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 1.2);
+                osc.start(now); osc.stop(now + 1.2);
             } else if (type === 'pop') {
-                osc.type = 'square'; osc.frequency.setValueAtTime(300, now);
-                gain.gain.setValueAtTime(0.1, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
-                osc.start(now); osc.stop(now + 0.1);
+                osc.type = 'square'; osc.frequency.setValueAtTime(400, now);
+                gain.gain.setValueAtTime(0.2, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+                osc.start(now); osc.stop(now + 0.15);
             } else if (type === 'whoosh') {
-                const b = audioCtx.createBuffer(1, audioCtx.sampleRate*2, audioCtx.sampleRate);
-                const d = b.getChannelData(0); for(let i=0; i<d.length; i++) d[i]=Math.random()*2-1;
-                const n = audioCtx.createBufferSource(); n.buffer=b; 
-                const ng = audioCtx.createGain(); n.connect(ng); ng.connect(audioCtx.destination);
-                ng.gain.setValueAtTime(0, now); ng.gain.linearRampToValueAtTime(0.3, now+0.2); ng.gain.linearRampToValueAtTime(0, now+1.5);
-                n.start(now);
+                // 简单的风声
+                const duration = 2.0;
+                const bufferSize = audioCtx.sampleRate * duration;
+                const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+                const data = buffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) data[i] = (Math.random() * 2 - 1) * 0.5; // 白噪音
+                
+                const noise = audioCtx.createBufferSource();
+                noise.buffer = buffer;
+                const noiseGain = audioCtx.createGain();
+                noise.connect(noiseGain); noiseGain.connect(audioCtx.destination);
+                
+                // 风声包络：淡入淡出
+                noiseGain.gain.setValueAtTime(0, now);
+                noiseGain.gain.linearRampToValueAtTime(0.4, now + 0.5); // 渐强
+                noiseGain.gain.linearRampToValueAtTime(0, now + 2.0); // 渐弱
+                noise.start(now);
             }
         }
 
-        // --- 1. 资源 ---
+        // --- 资源 ---
         function createResources() {
             const c=document.createElement('canvas'); c.width=32; c.height=32;
             const ctx=c.getContext('2d');
             const g=ctx.createRadialGradient(16,16,0,16,16,16); g.addColorStop(0,'rgba(255,255,255,1)'); g.addColorStop(0.4,'rgba(100,200,255,0.4)'); g.addColorStop(1,'rgba(0,0,0,0)');
-            ctx.fillStyle=g; ctx.fillRect(0,0,32,32);
-            textures.glow = new THREE.CanvasTexture(c);
+            ctx.fillStyle=g; ctx.fillRect(0,0,32,32); textures.glow = new THREE.CanvasTexture(c);
 
             textures.getEmoji=(e,s=64)=>{
                 const ec=document.createElement('canvas'); ec.width=s; ec.height=s;
@@ -182,7 +159,7 @@
             textures.santa=textures.getEmoji('🎅',128); textures.deer=textures.getEmoji('🦌',128);
         }
 
-        // --- 2. 初始化 ---
+        // --- 初始化 ---
         function init() {
             createResources();
             scene=new THREE.Scene(); scene.fog=new THREE.FogExp2(0x000510,0.02);
@@ -208,31 +185,22 @@
             window.addDeco=addDeco; window.playSound=playSound;
         }
 
-        // --- 3. 树 ---
+        // --- 逻辑 ---
         function buildTree() {
             const geo=new THREE.TetrahedronGeometry(0.3,0);
             const matM=new THREE.MeshStandardMaterial({color:0x87cefa,roughness:0.1,metalness:0.8,emissive:0x002244});
             const matS=new THREE.SpriteMaterial({map:textures.glow,color:0xffffff,transparent:true,blending:THREE.AdditiveBlending});
-
             for(let i=0; i<CONFIG.tree.count; i++) {
                 const isSprite=Math.random()>0.7;
                 const t=Math.random(); const h=CONFIG.tree.height; const r=CONFIG.tree.radius*(1-t);
                 const y=t*h-h/2+2; const a=Math.random()*Math.PI*2;
                 const pos=new THREE.Vector3(Math.cos(a)*r,y,Math.sin(a)*r);
-                
                 let item;
                 if(isSprite){ item=new THREE.Sprite(matS.clone()); item.scale.setScalar(0.5+Math.random()); }
                 else{ item=new THREE.Mesh(geo,matM.clone()); item.scale.setScalar(0.4+Math.random()*0.6); item.rotation.set(Math.random()*6,Math.random()*6,0); }
                 item.position.copy(pos); treeGroup.add(item);
-
-                const len=15+Math.random()*30;
-                const phi=Math.acos(-1+(2*i)/CONFIG.tree.count);
-                const theta=Math.sqrt(CONFIG.tree.count*Math.PI)*phi;
-                particles.push({
-                    mesh:item, basePos:pos.clone(),
-                    scatterPos:new THREE.Vector3(len*Math.cos(theta)*Math.sin(phi), len*Math.sin(theta)*Math.sin(phi), len*Math.cos(phi)),
-                    isDeco:false
-                });
+                const len=15+Math.random()*30; const phi=Math.acos(-1+(2*i)/CONFIG.tree.count); const theta=Math.sqrt(CONFIG.tree.count*Math.PI)*phi;
+                particles.push({mesh:item, basePos:pos.clone(), scatterPos:new THREE.Vector3(len*Math.cos(theta)*Math.sin(phi), len*Math.sin(theta)*Math.sin(phi), len*Math.cos(phi)), isDeco:false});
             }
         }
 
@@ -240,7 +208,6 @@
             let map, s=2.5, c=0xffffff;
             if(type==='BELL'){map=textures.bell;s=3.0;} else if(type==='GIFT')map=textures.getEmoji('🎁');
             else if(type==='SOCK')map=textures.getEmoji('🧦'); else map=null; 
-
             let item;
             if(type==='STAR'){
                 item=new THREE.Mesh(new THREE.OctahedronGeometry(1.5),new THREE.MeshStandardMaterial({color:0xffaa00,emissive:0xff8800,emissiveIntensity:2}));
@@ -254,26 +221,22 @@
             particles.push({mesh:item, basePos:item.position.clone(), scatterPos:item.position.clone().multiplyScalar(3), isDeco:true});
         }
 
-        // --- 4. 飞行单位 ---
         function spawnFlyingUnit(type) {
             playSound('whoosh');
             const isSanta=type==='SANTA'; const tex=isSanta?textures.santa:textures.deer; const dir=isSanta?1:-1;
             const s=new THREE.Sprite(new THREE.SpriteMaterial({map:tex,color:0xffffff})); s.scale.setScalar(6);
-            s.position.set(-40*dir, 5+Math.random()*10, 15);
-            scene.add(s);
+            s.position.set(-40*dir, 5+Math.random()*10, 15); scene.add(s);
             flyingObjects.push({mesh:s, dir:dir, speed:25+Math.random()*5});
-            
-            const st=document.getElementById('status-text');
-            st.innerText=isSanta?"🎅 圣诞老人来啦！":"🦌 麋鹿飞过！";
+            const st=document.getElementById('status-text'); st.innerText=isSanta?"🎅 圣诞老人来啦！":"🦌 麋鹿飞过！";
             setTimeout(()=>st.innerText="👉右滑:老人 | 👈左滑:麋鹿 | ✊摇一摇:暴风雪",2500);
         }
 
-        // --- 5. 交互 ---
         function setupEvents() {
             window.addEventListener('resize',()=>{camera.aspect=window.innerWidth/window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth,window.innerHeight); composer.setSize(window.innerWidth,window.innerHeight);});
             
+            // 启动按钮：同时初始化音频和传感器
             document.getElementById('btn-start').onclick=async()=>{
-                initAudio();
+                initAudio(); // 激活音频
                 document.getElementById('start-overlay').style.opacity=0;
                 setTimeout(()=>document.getElementById('start-overlay').remove(),500);
                 if(typeof DeviceOrientationEvent?.requestPermission==='function'){ try{await DeviceOrientationEvent.requestPermission();}catch(e){} }
@@ -324,11 +287,16 @@
             const acc=e.accelerationIncludingGravity; if(!acc)return;
             if(Math.abs(acc.x)+Math.abs(acc.y)+Math.abs(acc.z)>30 && Date.now()-lastShake>1500){
                 lastShake=Date.now();
-                STATE.blizzardIntensity=1.0; playSound('whoosh');
-                const f=document.getElementById('flash-fx'); f.style.opacity=0.8; setTimeout(()=>f.style.opacity=0,300);
-                document.getElementById('status-text').innerText="⚠️ 暴风雪警报 ⚠️";
-                if(navigator.vibrate)navigator.vibrate([100,50,100]);
+                triggerBlizzard();
             }
+        }
+
+        function triggerBlizzard() {
+            STATE.blizzardIntensity=1.0; 
+            playSound('whoosh'); // 播放暴风雪音效
+            const f=document.getElementById('flash-fx'); f.style.opacity=0.8; setTimeout(()=>f.style.opacity=0,300);
+            document.getElementById('status-text').innerText="⚠️ 暴风雪警报 ⚠️";
+            if(navigator.vibrate)navigator.vibrate([100,50,100]);
         }
 
         function buildSnow() {
