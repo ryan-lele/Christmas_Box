@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Hologram Projector V5.2 iOS Fix</title>
+    <title>Hologram Projector V5.3 (Fast Load)</title>
     
     <style>
         /* --- 字体与基础 --- */
@@ -16,12 +16,24 @@
             background-size: 100% 4px;
         }
 
-        /* --- 全息画布 --- */
         #hologram-canvas { position: absolute; top: 0; left: 0; z-index: 1; width: 100%; height: 100%; }
-
-        /* --- HUD 界面系统 --- */
         .hud-layer { position: absolute; z-index: 20; width: 100%; pointer-events: none; padding: 20px; box-sizing: border-box; }
         
+        /* --- 加载遮罩 (新增) --- */
+        #loading-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000; z-index: 9999;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            transition: opacity 0.5s;
+        }
+        .loader-ring {
+            width: 50px; height: 50px; border: 4px solid #00ffea; border-top: 4px solid transparent;
+            border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px;
+        }
+        .loading-text { color: #00ffea; font-size: 14px; letter-spacing: 2px; text-align: center; }
+        @keyframes spin { 0% {transform: rotate(0deg);} 100% {transform: rotate(360deg);} }
+
+        /* ... 原有样式保持不变 ... */
         .hud-top { 
             top: 0; display: flex; justify-content: space-between; align-items: center;
             background: linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);
@@ -32,83 +44,49 @@
             background: linear-gradient(to top, rgba(0,0,0,0.95), transparent);
             padding-bottom: 30px; padding-top: 40px;
         }
-
         .status-dot {
-            display: inline-block; width: 8px; height: 8px;
-            background-color: #00ffea; border-radius: 50%;
-            box-shadow: 0 0 10px #00ffea, 0 0 20px #00ffea; margin-right: 8px;
-            animation: blink 2s infinite;
+            display: inline-block; width: 8px; height: 8px; background-color: #00ffea; border-radius: 50%;
+            box-shadow: 0 0 10px #00ffea, 0 0 20px #00ffea; margin-right: 8px; animation: blink 2s infinite;
         }
         @keyframes blink { 0%, 100% {opacity: 1;} 50% {opacity: 0.3;} }
-
         .back-btn {
-            pointer-events: auto; text-decoration: none;
-            color: #00ffea; border: 1px solid #00ffea;
-            padding: 8px 16px; font-size: 12px; letter-spacing: 1px;
-            background: rgba(0, 40, 40, 0.6); backdrop-filter: blur(4px);
-            transition: all 0.3s; clip-path: polygon(10% 0, 100% 0, 100% 70%, 90% 100%, 0 100%, 0 30%);
+            pointer-events: auto; text-decoration: none; color: #00ffea; border: 1px solid #00ffea;
+            padding: 8px 16px; font-size: 12px; letter-spacing: 1px; background: rgba(0, 40, 40, 0.6); backdrop-filter: blur(4px);
         }
-
         .left-dock {
             position: absolute; left: 20px; top: 50%; transform: translateY(-50%);
             display: flex; flex-direction: column; gap: 15px; pointer-events: auto; z-index: 25;
         }
         .deco-btn {
-            width: 45px; height: 45px; border-radius: 50%;
-            background: rgba(0, 20, 20, 0.6); border: 1px solid rgba(0, 255, 234, 0.3);
+            width: 45px; height: 45px; border-radius: 50%; background: rgba(0, 20, 20, 0.6); border: 1px solid rgba(0, 255, 234, 0.3);
             color: #00ffea; font-size: 20px; display: flex; justify-content: center; align-items: center;
             cursor: pointer; transition: all 0.2s; box-shadow: 0 0 10px rgba(0, 255, 234, 0.1);
         }
-        .deco-btn:hover { transform: scale(1.1); background: rgba(0, 255, 234, 0.2); box-shadow: 0 0 20px rgba(0, 255, 234, 0.4); border-color: #00ffea; }
-
-        /* 摄像头小窗 (画中画) - 用于调试看是否有画面 */
+        .deco-btn:hover { transform: scale(1.1); background: rgba(0, 255, 234, 0.2); }
         #webcam-wrapper { 
             position: absolute; bottom: 120px; right: 20px; width: 120px; height: 90px; 
-            border: 1px solid #00ffea; background: #000; z-index: 15; opacity: 0.8;
-            box-shadow: 0 0 15px rgba(0, 255, 234, 0.2); transform: scaleX(-1);
+            border: 1px solid #00ffea; background: #000; z-index: 15; opacity: 0.8; transform: scaleX(-1);
         }
         #webcam-preview { width: 100%; height: 100%; object-fit: cover; }
         #gesture-status { 
             position: absolute; bottom: 0; left: 0; width: 100%; 
-            background: rgba(0, 255, 234, 0.8); color: #000; 
-            font-size: 9px; font-weight: bold; text-align: center; 
+            background: rgba(0, 255, 234, 0.8); color: #000; font-size: 9px; font-weight: bold; text-align: center; 
         }
-
         .upload-btn {
             pointer-events: auto; display: inline-block;
             background: linear-gradient(90deg, rgba(0, 100, 255, 0.3), rgba(0, 255, 234, 0.3));
-            border: 1px solid #00ffea; color: #e0ffff;
-            padding: 10px 30px; border-radius: 4px;
-            font-family: 'TechMono', monospace; font-size: 12px; letter-spacing: 1px;
-            cursor: pointer; box-shadow: 0 0 20px rgba(0, 255, 234, 0.2);
-            position: relative; overflow: hidden;
+            border: 1px solid #00ffea; color: #e0ffff; padding: 10px 30px; border-radius: 4px;
+            font-family: 'TechMono', monospace; font-size: 12px; letter-spacing: 1px; cursor: pointer;
+            opacity: 0.5; pointer-events: none; transition: opacity 0.3s; /* 初始禁用 */
         }
-        .upload-btn::before {
-            content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
-            animation: scan-light 3s infinite;
-        }
-        @keyframes scan-light { 0% {left: -100%;} 20% {left: 100%;} 100% {left: 100%;} }
+        .upload-btn.active { opacity: 1; pointer-events: auto; }
         .holo-scan {
-            position: absolute; top: 0; left: 0; width: 100%; height: 5px;
-            background: #00ffea; opacity: 0.3; box-shadow: 0 0 20px #00ffea;
-            animation: scanning 4s linear infinite; pointer-events: none; z-index: 10;
+            position: absolute; top: 0; left: 0; width: 100%; height: 5px; background: #00ffea; opacity: 0.3;
+            box-shadow: 0 0 20px #00ffea; animation: scanning 4s linear infinite; pointer-events: none; z-index: 10;
         }
-        @keyframes scanning { 0% {top: -10%; opacity: 0;} 10% {opacity: 0.5;} 90% {opacity: 0.5;} 100% {top: 110%; opacity: 0;} }
-
+        @keyframes scanning { 0% {top: -10%; opacity: 0;} 100% {top: 110%; opacity: 0;} }
         #file-input { display: none; }
-        
-        /* --- V5.2 关键修复：iOS Safari 强制解码 Hack --- */
-        /* 将视频移出屏幕外，但保持真实尺寸和哪怕一点点透明度 */
-        /* 这样 Safari 就会被迫认为它需要被渲染，从而保持解码 */
-        #webcam { 
-            position: fixed;
-            top: -1000px; left: -1000px;
-            width: 160px; height: 120px;
-            opacity: 0.01;
-            pointer-events: none;
-            z-index: -999;
-        }
+        #webcam { position: fixed; top: -1000px; left: -1000px; width: 160px; height: 120px; opacity: 0.01; pointer-events: none; z-index: -999; }
     </style>
 
     <script type="importmap">
@@ -123,12 +101,17 @@
 </head>
 <body>
 
+    <div id="loading-screen">
+        <div class="loader-ring"></div>
+        <div class="loading-text" id="loading-msg">INITIALIZING SYSTEM...</div>
+        <div style="margin-top:10px; color:#666; font-size:10px;">Downloading AI Models</div>
+    </div>
+
     <div class="holo-scan"></div>
 
     <div class="hud-layer hud-top">
         <div style="display:flex; align-items:center;">
-            <span class="status-dot"></span>
-            <span id="txt-proj" style="font-size:14px; letter-spacing:2px; text-shadow:0 0 10px #00ffea;">HOLOGRAM v5.2</span>
+            <span class="status-dot"></span><span id="txt-proj">HOLOGRAM v5.3</span>
         </div>
         <a href="mission.html" class="back-btn" id="txt-exit">← BACK</a>
     </div>
@@ -136,35 +119,26 @@
     <canvas id="hologram-canvas"></canvas>
 
     <div class="left-dock">
-        <button class="deco-btn" id="btn-add-star">★</button>
-        <button class="deco-btn" id="btn-add-gift">🎁</button>
-        <button class="deco-btn" id="btn-add-sock">🧦</button>
-        <button class="deco-btn" id="btn-add-apple">🍎</button>
+        <button class="deco-btn" id="btn-add-star">★</button><button class="deco-btn" id="btn-add-gift">🎁</button>
+        <button class="deco-btn" id="btn-add-sock">🧦</button><button class="deco-btn" id="btn-add-apple">🍎</button>
         <button class="deco-btn" id="btn-add-bauble">●</button>
     </div>
 
     <div id="webcam-wrapper">
         <canvas id="webcam-preview"></canvas>
-        <div id="gesture-status">SYSTEM INIT...</div>
+        <div id="gesture-status">WAITING...</div>
     </div>
     
     <video id="webcam" autoplay playsinline muted></video>
 
     <div class="hud-layer hud-bottom">
-        <label class="upload-btn">
-            <span id="txt-upload">📷 UPLOAD MEMORY</span>
-            <input type="file" id="file-input" multiple accept="image/*">
+        <label class="upload-btn" id="btn-upload-wrapper">
+            <span id="txt-upload">📷 UPLOAD MEMORY</span><input type="file" id="file-input" multiple accept="image/*">
         </label>
-        
         <div style="margin-top: 15px; color: rgba(0,255,234,0.7);">
             <div id="txt-sys" style="font-size:10px; letter-spacing:1px;">// SYSTEM: PARTICLE ENGINE ONLINE</div>
-            <div style="margin-top:5px;">
-                <span id="txt-target" style="color:#fff;">// TARGET: </span> 
-                <span id="target-name" style="color:#00ffea; font-weight:bold; text-shadow:0 0 10px cyan;">UNKNOWN</span>
-            </div>
-            <div id="txt-gesture" style="color: #fff; text-shadow: 0 0 5px cyan; font-size: 12px; margin-top:10px; font-weight:bold; letter-spacing: 1px;">
-                Downloading AI Model (Wait)...
-            </div>
+            <div style="margin-top:5px;"><span id="txt-target" style="color:#fff;">// TARGET: </span><span id="target-name" style="color:#00ffea; font-weight:bold;">UNKNOWN</span></div>
+            <div id="txt-gesture" style="color: #fff; text-shadow: 0 0 5px cyan; font-size: 12px; margin-top:10px; font-weight:bold; letter-spacing: 1px;">Initialize...</div>
         </div>
     </div>
 
@@ -175,20 +149,18 @@
         import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
         import { FilesetResolver, HandLandmarker } from '@mediapipe/tasks-vision';
 
-        // --- 参数解析与字典 ---
         const urlParams = new URLSearchParams(window.location.search);
         const childName = urlParams.get('name') || 'USER';
         const lang = urlParams.get('lang') || 'zh';
         document.getElementById('target-name').innerText = childName.toUpperCase();
 
         const dict = {
-            zh: { proj: "全息投影 v5.2", exit: "返回任务", sys: "// 系统: 粒子引擎已就绪", target: "// 锁定目标: ", upload: "📷 上传照片 (生成粒子)", status_ready: "视觉系统正常", hint: "✋张开:散开 | ☝️单指:看照片 | ✊握拳:还原", loading: "正在下载AI模型 (首次需1分钟)...", req: "请求摄像头权限..." },
-            en: { proj: "HOLOGRAM v5.2", exit: "BACK", sys: "// SYSTEM: ENGINE ONLINE", target: "// TARGET: ", upload: "📷 UPLOAD MEMORY", status_ready: "VISUAL OK", hint: "✋ OPEN: Scatter | ☝️ POINT: View | ✊ FIST: Reset", loading: "Downloading AI (Wait 1min)...", req: "Requesting Camera..." }
+            zh: { proj: "全息投影 v5.3", exit: "返回任务", sys: "// 系统: 粒子引擎已就绪", target: "// 锁定目标: ", upload: "📷 上传照片 (生成粒子)", status_ready: "视觉系统正常", hint: "✋张开:散开 | ☝️单指:看照片 | ✊握拳:还原", load1: "正在请求摄像头...", load2: "正在下载 AI 模型 (请勿关闭)...", load3: "启动全息引擎..." },
+            en: { proj: "HOLOGRAM v5.3", exit: "BACK", sys: "// SYSTEM: ENGINE ONLINE", target: "// TARGET: ", upload: "📷 UPLOAD MEMORY", status_ready: "VISUAL OK", hint: "✋ OPEN: Scatter | ☝️ POINT: View | ✊ FIST: Reset", load1: "Requesting Camera...", load2: "Downloading AI Model...", load3: "Starting Engine..." }
         };
         const t = dict[lang];
-        document.getElementById('txt-proj').innerText = t.proj; document.getElementById('txt-exit').innerText = t.exit; document.getElementById('txt-sys').innerText = t.sys; document.getElementById('txt-target').innerText = t.target; document.getElementById('txt-upload').innerText = t.upload; document.getElementById('txt-gesture').innerText = t.loading;
+        document.getElementById('txt-proj').innerText = t.proj; document.getElementById('txt-exit').innerText = t.exit; document.getElementById('txt-sys').innerText = t.sys; document.getElementById('txt-target').innerText = t.target; document.getElementById('txt-upload').innerText = t.upload; document.getElementById('loading-msg').innerText = t.load1;
 
-        // --- Three.js Setup ---
         const CONFIG = { colors: { bg: 0x000000, blueMain: 0x00ffea, whiteSilver: 0xffffff }, tree: { height: 26, radius: 9, count: 1200 }, fairyDust: { count: 800 } };
         const STATE = { mode: 'TREE', focusIndex: 0, hand: { detected: false }, rotationVelocity: 0, targetGroupPos: new THREE.Vector3(0,0,0) };
         let swipe = { lastX: null, lastTime: 0, cooldown: 500 };
@@ -202,13 +174,10 @@
             createResources(); initThree(); setupLights(); 
             createTreeLeaves(); createFairyDust(); createStringLights(); createDecorations(); createMagicRings(); createTopStar(); createDefaultPhoto(); createSnow();
             setupPostProcessing(); setupEvents(); animate();
-            initMediaPipe().catch(err => {
-                console.error(err);
-                document.getElementById('txt-gesture').innerText = "❌ AI启动失败 (请刷新重试)";
-                document.getElementById('gesture-status').innerText = "ERROR"; document.getElementById('gesture-status').style.color = "red";
-            });
+            initMediaPipe(); // 并行启动
         }
 
+        // ... (省略资源函数，内容不变，请保持原样) ...
         function createEmojiTexture(e,s=64){const c=document.createElement('canvas');c.width=s;c.height=s;const x=c.getContext('2d');x.font=`${s*0.8}px serif`;x.textAlign='center';x.textBaseline='middle';x.fillText(e,s/2,s/2+s*0.1);return new THREE.CanvasTexture(c);}
         function createResources(){
             const c=document.createElement('canvas');c.width=64;c.height=64;const x=c.getContext('2d');const g=x.createRadialGradient(32,32,0,32,32,32);g.addColorStop(0,'rgba(255,255,255,1)');g.addColorStop(0.4,'rgba(0,255,234,0.5)');g.addColorStop(1,'rgba(0,0,0,0)');x.fillStyle=g;x.fillRect(0,0,64,64);glowTex=new THREE.CanvasTexture(c);
@@ -259,60 +228,57 @@
         function setupPostProcessing() { const rp = new RenderPass(scene, camera); const bp = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.5, 0.4, 0.85); bp.threshold = 0; bp.strength = 1.2; bp.radius = 0.5; composer = new EffectComposer(renderer); composer.addPass(rp); composer.addPass(bp); }
         function setupEvents() { window.addEventListener('resize', ()=>{ camera.aspect=window.innerWidth/window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth,window.innerHeight); composer.setSize(window.innerWidth,window.innerHeight); }); const input = document.getElementById('file-input'); input.addEventListener('change', (e)=>{ if(e.target.files && e.target.files[0]) { Array.from(e.target.files).forEach(file => { const reader = new FileReader(); reader.onload=(ev)=>{ const img = new Image(); img.src=ev.target.result; img.onload=()=>{ new THREE.TextureLoader().load(ev.target.result, (tex)=>{ tex.colorSpace = THREE.SRGBColorSpace; addPhotoMesh(tex, img.width/img.height); STATE.focusIndex = photoMeshes.length-1; document.getElementById('txt-gesture').innerText = "Photo Ready! Point ☝️ to view."; }); } }; reader.readAsDataURL(file); }); input.value = ''; } }); ['star','gift','sock','apple','bauble'].forEach(k=>{ document.getElementById('btn-add-'+k).onclick=()=>addDecoration(k.toUpperCase()); }); }
 
-        // --- V5.2 核心修复：AI 与摄像头 ---
+        // --- 并行启动 AI 系统 ---
         async function initMediaPipe() {
             video = document.getElementById('webcam'); webcamCanvas = document.getElementById('webcam-preview'); webcamCtx = webcamCanvas.getContext('2d');
             webcamCanvas.width=160; webcamCanvas.height=120;
 
             try {
+                // 1. 先请求摄像头权限 (利用用户等待时间)
+                if(navigator.mediaDevices?.getUserMedia) {
+                    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
+                    video.srcObject = stream;
+                    video.onloadedmetadata = () => { video.play(); };
+                }
+
+                // 2. 同时开始下载模型
+                document.getElementById('loading-msg').innerText = t.load2;
                 const vision = await FilesetResolver.forVisionTasks("./wasm");
                 handLandmarker = await HandLandmarker.createFromOptions(vision, {
                     baseOptions: { modelAssetPath: "./wasm/hand_landmarker.task", delegate: "GPU" },
                     runningMode: "VIDEO", numHands: 1
                 });
 
-                document.getElementById('txt-gesture').innerText = t.req;
-
-                if(navigator.mediaDevices?.getUserMedia) {
-                    // V5.2 修复：移除强制分辨率，让手机自己决定
-                    const stream = await navigator.mediaDevices.getUserMedia({
-                        video: { facingMode: "user" }
-                    });
-                    video.srcObject = stream;
+                // 3. 一切就绪，解锁界面
+                document.getElementById('loading-msg').innerText = t.load3;
+                setTimeout(() => {
+                    document.getElementById('loading-screen').style.opacity = 0;
+                    setTimeout(()=>document.getElementById('loading-screen').remove(), 500);
                     
-                    // iOS 关键点：等待 metadata 加载完毕后再开始预测
-                    video.onloadedmetadata = () => {
-                        video.play(); // 再次强制播放
-                        predictWebcam();
-                        document.getElementById('gesture-status').innerText = t.status_ready;
-                        document.getElementById('txt-gesture').innerText = t.hint;
-                    };
-                }
+                    document.getElementById('btn-upload-wrapper').classList.add('active'); // 启用按钮
+                    document.getElementById('gesture-status').innerText = t.status_ready;
+                    document.getElementById('txt-gesture').innerText = t.hint;
+                    predictWebcam();
+                }, 500);
+
             } catch(e) {
                 console.error(e);
-                document.getElementById('txt-gesture').innerText = "❌ AI启动失败 (请确保网络通畅)";
+                document.getElementById('loading-msg').innerText = "ERROR: " + e.message;
+                document.getElementById('loading-msg').style.color = "red";
             }
         }
 
         let lastTime = -1;
         async function predictWebcam() {
-            // 确保 video 正在播放且有数据
             if(video.currentTime !== lastTime && video.readyState >= 2 && handLandmarker) {
                 lastTime = video.currentTime;
-                
                 let results;
-                try { results = handLandmarker.detectForVideo(video, performance.now()); } catch(e) { console.error(e); }
-
-                // 调试小窗绘制
-                webcamCtx.clearRect(0,0,160,120);
-                webcamCtx.drawImage(video, 0, 0, 160, 120);
-
+                try { results = handLandmarker.detectForVideo(video, performance.now()); } catch(e) {}
+                webcamCtx.clearRect(0,0,160,120); webcamCtx.drawImage(video, 0, 0, 160, 120);
                 if(results && results.landmarks.length > 0) {
                     processGestures(results.landmarks[0]);
                     webcamCtx.fillStyle = '#00ffea'; for(let p of results.landmarks[0]) { webcamCtx.beginPath(); webcamCtx.arc(p.x*160, p.y*120, 2, 0, 2*Math.PI); webcamCtx.fill(); }
-                } else {
-                    STATE.hand.detected = false;
-                }
+                } else { STATE.hand.detected = false; }
             }
             requestAnimationFrame(predictWebcam);
         }
