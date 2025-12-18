@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Hologram Projector V5.3 (Fast Load)</title>
+    <title>Hologram Projector V5.3 (Full)</title>
     
     <style>
         /* --- 字体与基础 --- */
@@ -33,7 +33,7 @@
         .loading-text { color: #00ffea; font-size: 14px; letter-spacing: 2px; text-align: center; }
         @keyframes spin { 0% {transform: rotate(0deg);} 100% {transform: rotate(360deg);} }
 
-        /* ... 原有样式保持不变 ... */
+        /* ... HUD 样式 ... */
         .hud-top { 
             top: 0; display: flex; justify-content: space-between; align-items: center;
             background: linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);
@@ -77,7 +77,7 @@
             background: linear-gradient(90deg, rgba(0, 100, 255, 0.3), rgba(0, 255, 234, 0.3));
             border: 1px solid #00ffea; color: #e0ffff; padding: 10px 30px; border-radius: 4px;
             font-family: 'TechMono', monospace; font-size: 12px; letter-spacing: 1px; cursor: pointer;
-            opacity: 0.5; pointer-events: none; transition: opacity 0.3s; /* 初始禁用 */
+            opacity: 0.5; pointer-events: none; transition: opacity 0.3s;
         }
         .upload-btn.active { opacity: 1; pointer-events: auto; }
         .holo-scan {
@@ -86,6 +86,7 @@
         }
         @keyframes scanning { 0% {top: -10%; opacity: 0;} 100% {top: 110%; opacity: 0;} }
         #file-input { display: none; }
+        /* iOS 修复关键：将视频移出屏幕外，但保持真实渲染尺寸 */
         #webcam { position: fixed; top: -1000px; left: -1000px; width: 160px; height: 120px; opacity: 0.01; pointer-events: none; z-index: -999; }
     </style>
 
@@ -177,8 +178,9 @@
             initMediaPipe(); // 并行启动
         }
 
-        // ... (省略资源函数，内容不变，请保持原样) ...
+        // --- 核心建模与材质 (完整版) ---
         function createEmojiTexture(e,s=64){const c=document.createElement('canvas');c.width=s;c.height=s;const x=c.getContext('2d');x.font=`${s*0.8}px serif`;x.textAlign='center';x.textBaseline='middle';x.fillText(e,s/2,s/2+s*0.1);return new THREE.CanvasTexture(c);}
+        
         function createResources(){
             const c=document.createElement('canvas');c.width=64;c.height=64;const x=c.getContext('2d');const g=x.createRadialGradient(32,32,0,32,32,32);g.addColorStop(0,'rgba(255,255,255,1)');g.addColorStop(0.4,'rgba(0,255,234,0.5)');g.addColorStop(1,'rgba(0,0,0,0)');x.fillStyle=g;x.fillRect(0,0,64,64);glowTex=new THREE.CanvasTexture(c);
             snowTex=createEmojiTexture('❄️'); giftTex=createEmojiTexture('🎁'); sockTex=createEmojiTexture('🧦'); appleTex=createEmojiTexture('🍎');
@@ -187,6 +189,7 @@
             ballGeo = new THREE.SphereGeometry(0.5, 16, 16);
             const sShape = new THREE.Shape(); for(let i=0; i<10; i++) { const r = i%2===0 ? 0.6 : 0.3; const a = i/10 * Math.PI*2; sShape.lineTo(Math.cos(a)*r, Math.sin(a)*r); } starGeo = new THREE.ExtrudeGeometry(sShape, { depth: 0.15, bevelEnabled:true, bevelThickness:0.05 });
         }
+
         function initThree() {
             const cvs = document.getElementById('hologram-canvas');
             scene = new THREE.Scene(); scene.fog = new THREE.FogExp2(0x000000, 0.02);
@@ -197,7 +200,9 @@
             renderer.toneMapping = THREE.ReinhardToneMapping; renderer.toneMappingExposure = 2.0;
             mainGroup = new THREE.Group(); treeGroup = new THREE.Group(); mainGroup.add(treeGroup); scene.add(mainGroup);
         }
+
         function setupLights() { const ambient = new THREE.AmbientLight(0x00ffff, 0.5); scene.add(ambient); const spot = new THREE.SpotLight(0x00ffea, 50); spot.position.set(30, 60, 50); scene.add(spot); }
+
         class Particle {
             constructor(mesh, type) {
                 this.mesh = mesh; this.type = type; this.basePos = mesh.position.clone(); this.baseScale = mesh.scale.x; this.baseRot = mesh.rotation.clone(); this.blinkSpeed = 2 + Math.random() * 3;
@@ -215,6 +220,7 @@
                 if(STATE.mode==='TREE') this.mesh.rotation.y += dt; 
             }
         }
+
         function createTreeLeaves() { const geo = new THREE.TetrahedronGeometry(0.4, 0); for(let i=0; i<CONFIG.tree.count; i++) { const t = Math.random(); const h = CONFIG.tree.height; const r = CONFIG.tree.radius * (1-t); const y = t*h - h/2 + 2; const a = Math.random() * Math.PI*2; const p = new THREE.Vector3(Math.cos(a)*r, y, Math.sin(a)*r); const mat = Math.random()>0.6 ? baseSilverMat.clone() : baseBlueMat.clone(); const mesh = new THREE.Mesh(geo, mat); mesh.position.copy(p); mesh.scale.setScalar(Math.random()*0.8+0.2); treeGroup.add(mesh); particles.push(new Particle(mesh, 'LEAF')); } }
         function createFairyDust() { const mat = new THREE.SpriteMaterial({ map: glowTex, color: 0xffffff, transparent: true, blending: THREE.AdditiveBlending }); for(let i=0; i<CONFIG.fairyDust.count; i++) { const s = new THREE.Sprite(mat); const t = Math.random(); const r = CONFIG.tree.radius*(1-t)*0.8; const y = t*CONFIG.tree.height - CONFIG.tree.height/2 + 2; const a = Math.random()*Math.PI*2; s.position.set(Math.cos(a)*r, y, Math.sin(a)*r); s.scale.setScalar(0.5); treeGroup.add(s); particles.push(new Particle(s, 'FAIRY')); } }
         function createStringLights() { const curvePts = []; const h = CONFIG.tree.height; for(let i=0; i<=200; i++) { const t = i/200; const a = t*7*Math.PI*2; const y = t*h-h/2+1; const r = CONFIG.tree.radius*(1-t)+0.4; curvePts.push(new THREE.Vector3(Math.cos(a)*r, y, Math.sin(a)*r)); } const curve = new THREE.CatmullRomCurve3(curvePts); lightTubeMesh = new THREE.Mesh(new THREE.TubeGeometry(curve, 120, 0.05, 8, false), new THREE.MeshBasicMaterial({ color: 0x88ccff, transparent:true, opacity:0.3 })); treeGroup.add(lightTubeMesh); const bulbGeo = new THREE.SphereGeometry(0.15); const bulbMat = new THREE.MeshBasicMaterial({ color: 0xffffff }); for(let i=0; i<150; i++) { const pt = curve.getPoint(i/150); const mesh = new THREE.Mesh(bulbGeo, bulbMat.clone()); mesh.position.copy(pt); mesh.userData.blinkRate = 2+Math.random()*3; treeGroup.add(mesh); particles.push(new Particle(mesh, 'LIGHT')); scene.userData.bulbs = scene.userData.bulbs || []; scene.userData.bulbs.push(mesh); } }
