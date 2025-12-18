@@ -7,53 +7,47 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Noto+Serif+SC:wght@300;700&family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Noto+Serif+SC:wght@300;700&family=Ma+Shan+Zheng&family=Special+Elite&display=swap" rel="stylesheet">
     
     <style>
         /* --- 基础设定 --- */
         body { 
             background-color: #020617; color: #fff; margin: 0; overflow-x: hidden; 
-            font-family: 'Noto Serif SC', 'Songti SC', serif; /* 高级宋体栈 */
+            font-family: 'Noto Serif SC', serif;
             -webkit-font-smoothing: antialiased;
+            -webkit-tap-highlight-color: transparent;
         }
 
         /* --- 视觉特效：黑金流光字 --- */
         .gold-text {
             background: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
+            -webkit-background-clip: text; background-clip: text; color: transparent;
             text-shadow: 0 0 30px rgba(251, 191, 36, 0.3);
-            background-size: 200% auto;
-            animation: shine 5s linear infinite;
+            background-size: 200% auto; animation: shine 5s linear infinite;
         }
         @keyframes shine { to { background-position: 200% center; } }
 
-        /* --- 视觉特效：磨砂玻璃 --- */
-        .glass-panel {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-        }
-
         /* --- 开场幕布 --- */
         #cinema-intro {
-            position: fixed; inset: 0; background: #000; z-index: 9999;
+            position: fixed; inset: 0; background: #020617; z-index: 9999;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             padding: 40px; text-align: center; cursor: pointer;
         }
         .intro-text {
-            font-family: 'Noto Serif SC', serif; color: #fbbf24; font-size: 1.3rem; line-height: 2.2;
-            text-shadow: 0 0 10px rgba(251, 191, 36, 0.5); min-height: 200px; font-weight: 300;
+            font-family: 'Special Elite', monospace; color: #fbbf24; font-size: 1.2rem; line-height: 2;
+            text-shadow: 0 0 10px rgba(251, 191, 36, 0.5); min-height: 180px;
         }
-        .tap-hint { margin-top: 30px; opacity: 0; color: #64748b; font-size: 0.9rem; letter-spacing: 2px; text-transform: uppercase; animation: pulse 2s infinite; }
+        .tap-hint { 
+            margin-top: 40px; opacity: 0; color: #94a3b8; font-size: 0.9rem; 
+            letter-spacing: 2px; text-transform: uppercase; animation: pulse 2s infinite; 
+            border: 1px solid rgba(255,255,255,0.2); padding: 8px 16px; border-radius: 20px;
+        }
         
         /* --- 主舞台 --- */
         #main-stage { opacity: 0; transition: opacity 2s; }
         #aurora-bg { position: fixed; inset: 0; z-index: -2; opacity: 0.6; pointer-events: none; }
         
-        /* --- 魔法坞 (Magic Dock) - 优化版 --- */
+        /* --- 魔法坞 (Magic Dock) --- */
         .magic-dock { 
             position: fixed; right: 20px; top: 50%; transform: translateY(-50%); 
             display: flex; flex-direction: column; gap: 20px; z-index: 5000; 
@@ -61,31 +55,21 @@
         .dock-btn {
             width: 48px; height: 48px; border-radius: 50%; 
             display: flex; justify-content: center; align-items: center; font-size: 1.5rem;
-            color: #fbbf24; text-decoration: none; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            /* 玻璃态 */
-            background: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(251, 191, 36, 0.3);
-            box-shadow: 0 0 15px rgba(0,0,0,0.5);
+            color: #fbbf24; text-decoration: none; transition: all 0.3s;
+            background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(8px);
+            border: 1px solid rgba(251, 191, 36, 0.3); box-shadow: 0 0 15px rgba(0,0,0,0.5);
         }
         .dock-btn:active { transform: scale(0.9); background: rgba(251, 191, 36, 0.2); }
         
-        /* --- 核心按钮：流光按钮 --- */
+        /* --- 核心按钮 --- */
         .hero-btn {
             position: relative; overflow: hidden;
             padding: 18px 48px; border-radius: 99px;
             background: linear-gradient(to bottom, #1e293b, #0f172a);
             border: 1px solid rgba(251, 191, 36, 0.5);
             color: #fbbf24; font-family: 'Cinzel', serif; font-weight: bold; font-size: 1.2rem;
-            box-shadow: 0 0 30px rgba(251, 191, 36, 0.15);
-            transition: transform 0.2s;
+            box-shadow: 0 0 30px rgba(251, 191, 36, 0.15); transition: transform 0.2s;
         }
-        .hero-btn::after {
-            content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-            animation: gloss-sweep 3s infinite;
-        }
-        @keyframes gloss-sweep { 0% {left: -100%;} 20% {left: 100%;} 100% {left: 100%;} }
         .hero-btn:active { transform: scale(0.95); }
 
         /* 底部视频 */
@@ -107,7 +91,7 @@
 
     <div id="cinema-intro">
         <div class="intro-text" id="typewriter-area"></div>
-        <div class="tap-hint" id="tap-hint">- 点击屏幕 接入信号 -</div>
+        <div class="tap-hint" id="tap-hint">👆 点击屏幕 接入信号</div>
     </div>
 
     <div id="main-stage">
@@ -136,6 +120,7 @@
     <script type="module">
         import { Renderer, Program, Mesh, Color, Triangle } from 'https://cdn.skypack.dev/ogl';
         
+        // --- 参数解析 ---
         const params = new URLSearchParams(window.location.search);
         const name = params.get('name') || '宝贝';
         const lang = params.get('lang') || 'zh';
@@ -144,10 +129,28 @@
             window.location.href = `${page}?name=${encodeURIComponent(name)}&lang=${lang}`;
         }
 
+        // --- 语音合成系统 (Audio Engine) ---
+        const synth = window.speechSynthesis;
+        function speak(text) {
+            // 取消之前的发音
+            synth.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = lang === 'zh' ? 'zh-CN' : 'en-US';
+            utterance.rate = 0.95; 
+            utterance.pitch = 1.0;
+            synth.speak(utterance);
+        }
+
+        // --- 文本内容 ---
         const introText = lang === 'zh' 
             ? `亲爱的 ${name}：\n我是来自北极的信使。\n监测到你在2025年的优异表现，\n特来给你赠送圣诞礼物。\n准备好进入雪花国度了吗？` 
             : `Dear ${name},\nMessenger from North Pole here.\nWe detected your amazing spirit in 2025!\nA gift awaits you.\nReady to enter the Snowflake Kingdom?`;
+        
+        const audioText = lang === 'zh' 
+            ? `亲爱的${name}，我是来自北极的信使。监测到你在2025年的优异表现，特来给你赠送圣诞礼物。准备好进入雪花国度了吗？`
+            : `Hello ${name}, I am the messenger from the North Pole. Ready for your gift?`;
 
+        // --- 打字机逻辑 ---
         const typeArea = document.getElementById('typewriter-area');
         const hint = document.getElementById('tap-hint');
         let i = 0;
@@ -162,14 +165,29 @@
                 hint.style.opacity = 1;
             }
         }
+        // 启动打字机
         setTimeout(type, 500);
 
+        // --- 核心修复：点击解锁音频 ---
         document.getElementById('cinema-intro').addEventListener('click', () => {
+            // 1. 播放空音频以解锁 iOS/Android 的音频引擎
+            const unlock = new SpeechSynthesisUtterance('');
+            synth.speak(unlock);
+
+            // 2. 延迟播放真正的开场白
+            setTimeout(() => {
+                speak(audioText);
+            }, 300);
+
+            // 3. 视觉转场
             gsap.to("#cinema-intro", { opacity: 0, duration: 1.5, pointerEvents: "none" });
             gsap.to("#main-stage", { opacity: 1, duration: 1.5, delay: 0.5 });
+            
+            // 4. 启动极光
             initAurora();
         });
 
+        // --- 极光特效 (轻量版) ---
         function initAurora() {
             const ctn = document.getElementById('aurora-bg');
             const renderer = new Renderer({alpha:true}); const gl=renderer.gl; ctn.appendChild(gl.canvas);
@@ -184,6 +202,7 @@
             requestAnimationFrame(function update(t){program.uniforms.uTime.value=t*0.0005;renderer.render({scene:mesh});requestAnimationFrame(update);});
         }
         
+        // --- 雪花特效 ---
         const snowCtn = document.getElementById('snow-container');
         setInterval(()=>{
             const f=document.createElement('div');f.className='snowflake';
