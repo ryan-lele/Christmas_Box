@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Certificate</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { 
+            background: #000; height: 100vh; display: flex; justify-content: center; align-items: center; margin: 0; 
+            font-family: 'Noto Serif SC', serif; overflow: hidden;
+        }
+        
+        /* --- 羊皮纸系统 --- */
+        .parchment {
+            background-color: #f4e4bc;
+            /* 噪点纹理，无需外部图片 */
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.15'/%3E%3C/svg%3E");
+            width: 90%; max-width: 400px; padding: 40px 25px;
+            border-radius: 4px;
+            /* 边缘发光 + 投影 */
+            box-shadow: 
+                inset 0 0 80px rgba(139, 69, 19, 0.3), /* 内部旧化 */
+                0 0 0 5px #8b0000, /* 红边 */
+                0 0 0 8px #d4af37, /* 金边 */
+                0 20px 60px rgba(0,0,0,0.9); /* 悬浮影 */
+            text-align: center; position: relative;
+        }
+
+        /* 墨水效果 */
+        .ink-text { color: #2c2c2c; mix-blend-mode: multiply; }
+
+        .seal { 
+            width: 90px; height: 90px; background: #8b0000; color: #d4af37; border-radius: 50%; 
+            display: flex; justify-content: center; align-items: center; font-size: 3rem; 
+            border: 3px solid #d4af37; margin: -60px auto 20px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            position: relative; z-index: 10;
+        }
+        
+        .title { 
+            color: #555; font-size: 1.1rem; letter-spacing: 4px; text-transform: uppercase; 
+            border-bottom: 1px solid #8b0000; display: inline-block; padding-bottom: 5px; margin-bottom: 10px; 
+        }
+        
+        .name { 
+            font-family: 'Ma Shan Zheng', cursive; font-size: 3.8rem; color: #8b0000; 
+            margin: 10px 0 20px; transform: rotate(-3deg); mix-blend-mode: multiply;
+        }
+        
+        .content { 
+            font-size: 1.1rem; line-height: 1.8; color: #1a0505; min-height: 120px; 
+            text-align: justify; font-weight: 600; 
+        }
+        
+        .next-btn {
+            margin-top: 30px;
+            background: #1a0505; color: #d4af37; border: 1px solid #d4af37;
+            padding: 12px 30px; border-radius: 4px;
+            font-size: 1.1rem; font-family: 'Noto Serif SC', serif;
+            cursor: pointer; opacity: 0; transition: all 0.5s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+        .next-btn.show { opacity: 1; }
+
+        /* 导航 */
+        .magic-dock { position: fixed; right: 20px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 20px; z-index: 5000; }
+        .dock-btn { width: 45px; height: 45px; border-radius: 50%; background: rgba(0,0,0,0.6); border: 1px solid #fbbf24; color: #fbbf24; display: flex; justify-content: center; align-items: center; text-decoration: none; font-size: 1.4rem; }
+        .back-btn { position: fixed; top: 20px; left: 20px; color: #fff; text-decoration: none; display: flex; align-items: center; gap: 5px; opacity: 0.5; }
+    </style>
+</head>
+<body>
+    <a href="javascript:navTo('index.html')" class="back-btn"><i class="ph-bold ph-arrow-left"></i> 主页</a>
+
+    <div class="magic-dock">
+        <a href="javascript:navTo('certificate.html')" class="dock-btn">📜</a>
+        <a href="javascript:navTo('mission.html')" class="dock-btn">💌</a>
+        <a href="javascript:navTo('magic.html')" class="dock-btn">🎄</a>
+    </div>
+
+    <div class="parchment">
+        <div class="seal"><i class="ph-fill ph-check"></i></div>
+        <div class="title ink-text">官方认证</div>
+        <div class="name" id="childName"></div>
+        <div class="content ink-text" id="typewriter"></div>
+        
+        <button class="next-btn" id="nextBtn" onclick="navTo('mission.html')">
+            接受绝密任务
+        </button>
+    </div>
+
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const name = params.get('name') || '宝宝';
+        const lang = params.get('lang') || 'zh';
+        document.getElementById('childName').innerText = name;
+
+        window.navTo = function(page) {
+            window.location.href = `${page}?name=${encodeURIComponent(name)}&lang=${lang}`;
+        }
+
+        const textCN = `经北极精灵事务部审核：虽然你今年偶尔会发点小脾气，或者不爱收拾玩具，但你拥有一颗非常善良的心。判定结果：2025年度超级好孩子！`;
+        const textEN = `North Pole Audit: Although slightly naughty at times, you have a heart of gold. Verdict: Super Good Child of 2025!`;
+        
+        const finalTxt = lang === 'zh' ? textCN : textEN;
+        const container = document.getElementById('typewriter');
+        
+        // 语音
+        setTimeout(() => {
+            const u = new SpeechSynthesisUtterance(finalTxt);
+            u.lang = lang === 'zh' ? 'zh-CN' : 'en-US';
+            u.rate = 0.95; 
+            window.speechSynthesis.speak(u);
+        }, 800);
+
+        // 打字机
+        let i = 0;
+        function type() {
+            if (i < finalTxt.length) {
+                container.innerHTML += finalTxt.charAt(i);
+                i++;
+                setTimeout(type, 80);
+            } else {
+                document.getElementById('nextBtn').classList.add('show');
+            }
+        }
+        setTimeout(type, 800);
+        setTimeout(() => document.getElementById('nextBtn').classList.add('show'), 5000);
+    </script>
+</body>
+</html>
