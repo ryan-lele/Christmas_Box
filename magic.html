@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Magic Gift V15.0 (Audio Fix)</title>
+    <title>Magic Gift V16.0 (Sound Btn)</title>
     
     <style>
         body { margin: 0; overflow: hidden; background: radial-gradient(circle at center, #001020 0%, #000000 100%); touch-action: none; font-family: 'Courier New', sans-serif; -webkit-user-select: none; user-select: none; }
@@ -23,9 +23,17 @@
         }
         @keyframes pulse { 50% { box-shadow: 0 0 40px #00bfff; } }
 
+        /* 顶部音频按钮 */
+        .sound-toggle-btn {
+            position: absolute; top: 15px; left: 15px; pointer-events: auto;
+            border: 1px solid #00ffea; color: #00ffea; background: rgba(0,50,50,0.5);
+            padding: 8px 12px; font-size: 12px; border-radius: 4px; display: flex; align-items: center; gap: 5px;
+        }
+        .sound-toggle-btn:active { background: #00ffea; color: #000; }
+
         /* UI 元素 */
         h1 { position: absolute; top: 8%; width: 100%; text-align: center; color: #e0f7fa; font-size: 28px; text-shadow: 0 0 10px #00bfff; opacity: 0.9; margin: 0; }
-        .left-panel { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 15px; pointer-events: auto; }
+        .left-dock { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 15px; pointer-events: auto; }
         .deco-btn { width: 44px; height: 44px; border-radius: 50%; background: rgba(0, 20, 40, 0.6); border: 1px solid rgba(135, 206, 250, 0.4); color: #fff; font-size: 22px; display: flex; justify-content: center; align-items: center; cursor: pointer; }
         .bottom-panel { position: absolute; bottom: max(30px, env(safe-area-inset-bottom)); width: 100%; text-align: center; pointer-events: auto; display: flex; flex-direction: column; gap: 12px; align-items: center;}
         .btn-photo { background: rgba(0, 80, 200, 0.4); border: 1px solid #87cefa; color: #e0ffff; padding: 10px 30px; border-radius: 30px; font-weight: bold; display: inline-block; }
@@ -47,15 +55,17 @@
 
     <div id="start-overlay">
         <h2 style="color:#e0ffff; margin-bottom:30px; font-family:serif; letter-spacing:2px;">THE FROZEN GIFT</h2>
-        <button class="start-btn" id="btn-start">❄️ 点击开启声音 ❄️</button>
+        <button class="start-btn" id="btn-start">❄️ 开启魔法 ❄️</button>
         <p style="color:#557799; font-size:12px; margin-top:20px;">Sound & Gyroscope Required</p>
     </div>
 
     <div id="ui-layer">
+        <button class="sound-toggle-btn" onclick="forceAudio()">🔊 SOUND CHECK</button>
+
         <h1>Merry Christmas</h1>
         <div class="top-right"><a href="mission.html" class="back-link">EXIT</a></div>
         
-        <div class="left-panel">
+        <div class="left-dock">
             <div class="deco-btn" onclick="addDeco('STAR'); playSound('ding')">★</div>
             <div class="deco-btn" onclick="addDeco('GIFT'); playSound('pop')">🎁</div>
             <div class="deco-btn" onclick="addDeco('SOCK'); playSound('pop')">🧦</div>
@@ -80,31 +90,35 @@
         let particles = [], flyingObjects = [], clock = new THREE.Clock(), textures = {}; 
         let audioCtx = null;
 
-        // --- 音频增强版 ---
+        // --- 音频核心 ---
         function initAudio() {
             try {
                 const AudioContext = window.AudioContext || window.webkitAudioContext;
                 audioCtx = new AudioContext();
-                
-                // 关键：强制恢复 AudioContext (iOS 修复)
-                if (audioCtx.state === 'suspended') {
-                    audioCtx.resume();
-                }
-
-                // 播放无声缓冲，打通通道
+                // 播放一段静音以解锁
                 const buffer = audioCtx.createBuffer(1, 1, 22050);
                 const source = audioCtx.createBufferSource();
                 source.buffer = buffer;
                 source.connect(audioCtx.destination);
                 source.start(0);
-                console.log("Audio System Init: OK");
             } catch(e) { console.error("Audio Init Failed", e); }
+        }
+
+        // 手动强制唤醒音频
+        window.forceAudio = function() {
+            if(!audioCtx) initAudio();
+            if(audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume().then(() => {
+                    playSound('ding'); // 成功提示音
+                    alert("音频已激活！(Audio Active)");
+                });
+            } else {
+                playSound('ding'); // 如果已经是好的，就响一声
+            }
         }
 
         function playSound(type) {
             if(!audioCtx) return;
-            if(audioCtx.state === 'suspended') audioCtx.resume(); // 双重保险
-
             const now = audioCtx.currentTime;
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
@@ -123,22 +137,17 @@
                 gain.gain.setValueAtTime(0.2, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
                 osc.start(now); osc.stop(now + 0.15);
             } else if (type === 'whoosh') {
-                // 简单的风声
-                const duration = 2.0;
-                const bufferSize = audioCtx.sampleRate * duration;
+                const bufferSize = audioCtx.sampleRate * 2.0;
                 const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
                 const data = buffer.getChannelData(0);
-                for (let i = 0; i < bufferSize; i++) data[i] = (Math.random() * 2 - 1) * 0.5; // 白噪音
-                
+                for (let i = 0; i < bufferSize; i++) data[i] = (Math.random() * 2 - 1) * 0.5;
                 const noise = audioCtx.createBufferSource();
                 noise.buffer = buffer;
                 const noiseGain = audioCtx.createGain();
                 noise.connect(noiseGain); noiseGain.connect(audioCtx.destination);
-                
-                // 风声包络：淡入淡出
                 noiseGain.gain.setValueAtTime(0, now);
-                noiseGain.gain.linearRampToValueAtTime(0.4, now + 0.5); // 渐强
-                noiseGain.gain.linearRampToValueAtTime(0, now + 2.0); // 渐弱
+                noiseGain.gain.linearRampToValueAtTime(0.4, now + 0.5);
+                noiseGain.gain.linearRampToValueAtTime(0, now + 2.0);
                 noise.start(now);
             }
         }
@@ -234,9 +243,8 @@
         function setupEvents() {
             window.addEventListener('resize',()=>{camera.aspect=window.innerWidth/window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth,window.innerHeight); composer.setSize(window.innerWidth,window.innerHeight);});
             
-            // 启动按钮：同时初始化音频和传感器
             document.getElementById('btn-start').onclick=async()=>{
-                initAudio(); // 激活音频
+                initAudio();
                 document.getElementById('start-overlay').style.opacity=0;
                 setTimeout(()=>document.getElementById('start-overlay').remove(),500);
                 if(typeof DeviceOrientationEvent?.requestPermission==='function'){ try{await DeviceOrientationEvent.requestPermission();}catch(e){} }
@@ -292,8 +300,7 @@
         }
 
         function triggerBlizzard() {
-            STATE.blizzardIntensity=1.0; 
-            playSound('whoosh'); // 播放暴风雪音效
+            STATE.blizzardIntensity=1.0; playSound('whoosh');
             const f=document.getElementById('flash-fx'); f.style.opacity=0.8; setTimeout(()=>f.style.opacity=0,300);
             document.getElementById('status-text').innerText="⚠️ 暴风雪警报 ⚠️";
             if(navigator.vibrate)navigator.vibrate([100,50,100]);
