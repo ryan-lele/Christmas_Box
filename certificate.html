@@ -5,58 +5,97 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Certificate of Excellence</title>
     <script src="https://cdn.bootcdn.net/ajax/libs/tailwindcss/3.3.3/cdn.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Noto+Serif+SC:wght@700&family=Special+Elite&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@700&display=swap" rel="stylesheet">
     <style>
-        body { background: #1a0b00; color: #3e2723; font-family: 'Noto Serif SC', serif; overflow: hidden; }
+        body { 
+            background: #1a0b00; 
+            color: #3e2723; 
+            font-family: "KaiTi", "STKaiti", "Noto Serif SC", serif; /* 强制楷体 */
+            overflow: hidden; 
+            margin: 0;
+        }
+
+        /* 羊皮纸背景 (纯CSS模拟，防链接失效) */
         .parchment {
-            background: url('https://img.freepik.com/free-photo/old-paper-texture_1194-6729.jpg');
-            background-size: cover; box-shadow: 0 0 50px rgba(0,0,0,0.8) inset;
-            position: fixed; inset: 20px; border: 2px solid #b8860b;
+            position: fixed; inset: 15px; 
+            background-color: #f4e4bc;
+            background-image: url("data:image/svg+xml,%3Csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.5' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.4'/%3E%3C/svg%3E");
+            box-shadow: 0 0 30px rgba(0,0,0,0.8) inset, 0 0 20px rgba(0,0,0,0.5);
+            border: 8px solid transparent;
+            border-image: linear-gradient(to bottom right, #b8860b 0%, #8b4513 100%);
+            border-image-slice: 1;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             text-align: center; padding: 20px;
         }
-        .seal {
-            width: 120px; height: 120px; border: 4px solid #8b0000; border-radius: 50%;
-            color: #8b0000; font-weight: bold; display: flex; align-items: center; justify-content: center;
-            transform: rotate(-15deg) scale(2); opacity: 0; transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            font-family: 'Special Elite', cursive; font-size: 1.2rem;
-            border-style: double; box-shadow: 0 0 0 4px #8b0000 inset;
+        /* 四角花纹 (装饰) */
+        .corner {
+            position: absolute; width: 40px; height: 40px;
+            border-top: 3px solid #8b0000; border-left: 3px solid #8b0000;
         }
-        .seal.stamped { opacity: 0.8; transform: rotate(-15deg) scale(1); }
+        .corner.tr { top: 10px; right: 10px; transform: rotate(90deg); }
+        .corner.tl { top: 10px; left: 10px; }
+        .corner.br { bottom: 10px; right: 10px; transform: rotate(180deg); }
+        .corner.bl { bottom: 10px; left: 10px; transform: rotate(-90deg); }
+
+        /* 印章 (图片版) */
+        .seal-img {
+            width: 160px; height: 160px; 
+            object-fit: contain;
+            transform: scale(2) rotate(-20deg); 
+            opacity: 0; 
+            transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            filter: drop-shadow(0 5px 10px rgba(0,0,0,0.3));
+            margin-top: 10px;
+        }
+        .seal-img.stamped { opacity: 1; transform: scale(1) rotate(-20deg); }
+
         .next-btn {
-            margin-top: 30px; padding: 12px 30px; background: #8b0000; color: #ffd700;
-            border: none; border-radius: 5px; font-family: 'Cinzel', serif; font-size: 1.1rem;
+            margin-top: 30px; padding: 12px 40px; 
+            background: linear-gradient(to bottom, #8b0000, #5a0000); 
+            color: #ffd700;
+            border: 1px solid #ffd700; border-radius: 50px; 
+            font-family: 'Cinzel', serif; font-size: 1.1rem; letter-spacing: 1px;
             opacity: 0; pointer-events: none; transition: opacity 1s;
+            box-shadow: 0 5px 15px rgba(139, 0, 0, 0.4);
         }
-        /* 新增：朗读按钮 */
+
+        /* 朗读按钮 */
         .audio-btn {
             position: absolute; top: 20px; right: 20px;
-            background: rgba(139, 0, 0, 0.1); border: 1px solid #8b0000; color: #8b0000;
-            padding: 8px 15px; border-radius: 20px; font-weight: bold; font-size: 0.9rem;
+            background: rgba(139, 0, 0, 0.05); border: 1px solid #8b0000; color: #8b0000;
+            padding: 6px 12px; border-radius: 20px; font-weight: bold; font-size: 0.8rem;
             cursor: pointer; z-index: 50; display: flex; align-items: center; gap: 5px;
         }
-        .audio-btn:active { background: rgba(139, 0, 0, 0.3); }
+        
+        h1 { text-shadow: 0 2px 0 rgba(255,255,255,0.5); }
+        h2 { text-shadow: 0 2px 4px rgba(0,0,0,0.1); font-family: 'Ma Shan Zheng', cursive !important; }
     </style>
 </head>
 <body>
     <div class="parchment" id="paper">
-        <button class="audio-btn" onclick="playAudio()">🔊 朗读证书</button>
+        <div class="corner tl"></div><div class="corner tr"></div>
+        <div class="corner bl"></div><div class="corner br"></div>
 
-        <h1 class="text-3xl mb-2 font-bold text-yellow-900" style="font-family: 'Cinzel'">好孩子证书</h1>
-        <div class="w-full h-1 bg-yellow-900 mb-6 opacity-50"></div>
+        <button class="audio-btn" onclick="playAudio()">🔊 朗读</button>
+
+        <h1 class="text-3xl mb-1 font-bold text-yellow-900" style="font-family: 'Cinzel'">CERTIFICATE</h1>
+        <div class="text-xs tracking-widest text-yellow-800 mb-4 opacity-70">OF NORTH POLE OFFICIAL LIST</div>
         
-        <p class="text-lg mb-4">兹证明</p>
-        <h2 class="text-4xl mb-6 font-bold text-red-900" id="child-name"></h2>
-        <p class="text-md leading-relaxed mb-8 px-4">
-            在2025年度表现优异<br>
-            诚实勇敢，充满爱心<br>
-            经北极精灵委员会审核<br>
-            特颁发此证
+        <div class="w-2/3 h-px bg-yellow-900 mb-8 opacity-30"></div>
+        
+        <p class="text-lg mb-4 font-bold opacity-80">兹 证 明</p>
+        
+        <h2 class="text-5xl mb-6 text-red-900" id="child-name">宝贝</h2>
+        
+        <p class="text-lg leading-loose mb-2 px-4 font-medium">
+            在 2025 年度表现优异<br>
+            诚实勇敢 · 充满爱心
         </p>
+        <p class="text-sm opacity-60 mb-6">经由北极精灵委员会最终审核</p>
 
-        <div class="seal" id="seal">OFFICIAL<br>NORTH POLE<br>APPROVED</div>
+        <img src="poster_xhgd.jpg" class="seal-img" id="seal" alt="Seal">
         
-        <button class="next-btn" id="btn-next" onclick="goNext()">接受任务 (Accept Mission)</button>
+        <button class="next-btn" id="btn-next" onclick="goNext()">接受任务 ACCEPT MISSION</button>
     </div>
 
     <script>
@@ -64,39 +103,48 @@
         const name = params.get('name') || '宝贝';
         document.getElementById('child-name').innerText = name;
 
-        const speechText = `祝贺你，${name}。这是你的好孩子证书。北极委员会已经批准了你的礼物申请。现在，请点击按钮，接受你的秘密任务。`;
+        // 优化朗读文案：更自然，去掉了机器味
+        const speechText = `祝贺你，${name}。北极委员会已经批准了你的礼物申请。这是你的好孩子证书。现在，请点击下方的按钮，接受你的秘密任务。`;
 
-        // 核心：手动播放
         function playAudio() {
             window.speechSynthesis.cancel();
             const u = new SpeechSynthesisUtterance(speechText);
-            u.lang = 'zh-CN'; u.rate = 1.0;
+            u.lang = 'zh-CN'; u.rate = 1.0; 
+            // 尝试指定中文语音（如果不生效会自动回退）
+            const voices = window.speechSynthesis.getVoices();
+            const zhVoice = voices.find(v => v.lang.includes('zh'));
+            if(zhVoice) u.voice = zhVoice;
             window.speechSynthesis.speak(u);
         }
 
         // 盖章逻辑
         let stamped = false;
-        document.body.addEventListener('click', (e) => {
-            // 如果点的是朗读按钮，不触发盖章
-            if (e.target.closest('.audio-btn')) return;
-            
+        // 自动盖章（进页面1秒后）
+        setTimeout(() => {
             if (stamped) return;
             stamped = true;
+            
+            // 播放一个“咚”的盖章音效（可选，如果有 seal.mp3）
+            // new Audio('seal.mp3').play().catch(()=>{});
+
             document.getElementById('seal').classList.add('stamped');
             
-            // 自动尝播放一次，如果失败用户可以点按钮
-            playAudio();
-
+            // 盖章动画完成后，自动朗读
             setTimeout(() => {
+                playAudio();
+                // 显示下一步按钮
                 const btn = document.getElementById('btn-next');
                 btn.style.opacity = 1;
                 btn.style.pointerEvents = 'auto';
-            }, 1000);
-        });
+            }, 800);
+        }, 800);
 
         window.goNext = function() {
             window.location.href = `mission.html${window.location.search}`;
         }
+        
+        // 预加载语音库
+        window.speechSynthesis.getVoices();
     </script>
 </body>
 </html>
