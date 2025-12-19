@@ -37,10 +37,13 @@
         .corner.br { bottom: 10px; right: 10px; transform: rotate(180deg); }
         .corner.bl { bottom: 10px; left: 10px; transform: rotate(-90deg); }
 
-        /* 印章 (图片版) */
+       /* 印章 (图片版) - 修复版 */
         .seal-img {
             width: 160px; height: 160px; 
-            object-fit: contain;
+            object-fit: cover; /* 确保图片填满圆圈，不变形 */
+            border-radius: 50%; /* 【关键】把方形切成圆形 */
+            border: 2px solid rgba(139, 0, 0, 0.3); /* 加个淡淡的红边，像贴纸一样 */
+            
             transform: scale(2) rotate(-20deg); 
             opacity: 0; 
             transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -93,7 +96,7 @@
         </p>
         <p class="text-sm opacity-60 mb-6">经由北极精灵委员会最终审核</p>
 
-        <img src="poster_xhgd.jpg" class="seal-img" id="seal" alt="Seal">
+        <img src="seal.png" class="seal-img" id="seal" alt="Seal">
         
         <button class="next-btn" id="btn-next" onclick="goNext()">接受任务 ACCEPT MISSION</button>
     </div>
