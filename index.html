@@ -21,6 +21,27 @@
             -webkit-tap-highlight-color: transparent;
         }
 
+        /* --- 顶部品牌栏 (New) --- */
+        .brand-bar {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            background: linear-gradient(to bottom, rgba(2,6,23,0.9), transparent);
+            pointer-events: none;
+        }
+        .brand-logo {
+            font-family: 'Cinzel', serif;
+            color: #fbbf24;
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
+            font-weight: bold;
+        }
+
         /* --- 视觉特效：黑金流光字 --- */
         .gold-text {
             background: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
@@ -55,161 +76,146 @@
             font-size: 1.1rem; 
             line-height: 1.8;
             text-shadow: 0 0 10px rgba(251, 191, 36, 0.5); 
-            min-height: 200px;
+            min-height: 150px;
             max-width: 600px;
             text-align: left;
+            margin-bottom: 40px;
         }
 
-        .tap-hint { 
-            margin-top: 40px; 
+        /* 解封按钮 (优化版) */
+        .decrypt-btn { 
             opacity: 0; 
-            color: #94a3b8; 
-            font-size: 0.9rem; 
+            background: transparent;
+            color: #fbbf24; 
+            font-family: 'Cinzel', serif;
+            font-size: 1rem; 
             letter-spacing: 2px; 
             text-transform: uppercase; 
-            animation: pulse 2s infinite; 
-            border: 1px solid rgba(255,255,255,0.2); 
-            padding: 10px 24px; 
-            border-radius: 99px;
+            border: 1px solid rgba(251, 191, 36, 0.4); 
+            padding: 16px 32px; 
+            border-radius: 4px;
             transition: 0.3s;
+            position: relative;
+            overflow: hidden;
         }
-        .tap-hint:hover { background: rgba(251, 191, 36, 0.1); border-color: #fbbf24; }
-        
+        .decrypt-btn::before {
+            content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(251, 191, 36, 0.2), transparent);
+            animation: scan 3s infinite;
+        }
+        @keyframes scan { 0% {left: -100%} 100% {left: 200%} }
+
         /* --- 主舞台 (Main Stage) --- */
-        #main-stage { opacity: 0; transition: opacity 2s; position: relative; z-index: 10; }
+        #main-stage { opacity: 0; transition: opacity 2s; position: relative; z-index: 10; padding-top: 70px; }
         
         /* 极光背景容器 */
         #aurora-bg { position: fixed; inset: 0; z-index: -2; opacity: 0.6; pointer-events: none; }
         
+        /* --- 视频区域 (C位) --- */
+        .video-wrapper {
+            width: 100%;
+            max-width: 450px; /* 限制最大宽度，防止PC端太大 */
+            margin: 0 auto 30px auto;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 0 40px rgba(251, 191, 36, 0.2);
+            border: 1px solid rgba(251, 191, 36, 0.3);
+            position: relative;
+            aspect-ratio: 9/16;
+            background: #000;
+        }
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        /* --- 底部文字 --- */
+        .main-content {
+            text-align: center;
+            padding: 0 20px 50px 20px;
+        }
+
         /* --- 魔法导航坞 (Side Dock) --- */
         .magic-dock { 
-            position: fixed; right: 20px; top: 50%; transform: translateY(-50%); 
-            display: flex; flex-direction: column; gap: 20px; z-index: 5000; 
+            position: fixed; right: 20px; bottom: 40px; 
+            display: flex; flex-direction: column; gap: 15px; z-index: 5000; 
         }
         .dock-btn {
-            width: 48px; height: 48px; border-radius: 50%; 
-            display: flex; justify-content: center; align-items: center; font-size: 1.5rem;
+            width: 44px; height: 44px; border-radius: 50%; 
+            display: flex; justify-content: center; align-items: center; font-size: 1.2rem;
             color: #fbbf24; text-decoration: none; transition: all 0.3s;
-            background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(8px);
-            border: 1px solid rgba(251, 191, 36, 0.3); box-shadow: 0 0 15px rgba(0,0,0,0.5);
-        }
-        .dock-btn:active { transform: scale(0.9); background: rgba(251, 191, 36, 0.2); }
-        
-        /* --- 核心按钮 (Hero Button) --- */
-        .hero-btn {
-            position: relative; overflow: hidden;
-            padding: 18px 48px; border-radius: 99px;
-            background: linear-gradient(to bottom, #1e293b, #0f172a);
-            border: 1px solid rgba(251, 191, 36, 0.5);
-            color: #fbbf24; font-family: 'Cinzel', serif; font-weight: bold; font-size: 1.2rem;
-            box-shadow: 0 0 30px rgba(251, 191, 36, 0.15); transition: transform 0.2s;
-            cursor: pointer;
-        }
-        .hero-btn:active { transform: scale(0.95); }
-
-        /* --- 底部视频区域 --- */
-        .footer { 
-            margin-top: 20vh; /* 调整间距 */
-            padding: 50px 20px 100px 20px; 
-            background: linear-gradient(to top, #020617 20%, transparent); 
-            text-align: center; 
-        }
-        .video-box { 
-            border: 1px solid rgba(251, 191, 36, 0.3); 
-            border-radius: 12px; 
-            overflow: hidden; 
-            max-width: 600px; 
-            margin: 0 auto; 
-            box-shadow: 0 20px 50px rgba(0,0,0,0.8); 
-            background: #000;
+            background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px);
+            border: 1px solid rgba(251, 191, 36, 0.3);
         }
 
         /* 动画定义 */
-        @keyframes pulse { 0%, 100% {opacity: 0.3;} 50% {opacity: 1;} }
         @keyframes fall { to { transform: translateY(110vh); } }
         .snowflake { position: absolute; background: white; border-radius: 50%; opacity: 0.8; animation: fall linear infinite; pointer-events: none; }
     </style>
 </head>
 <body>
 
+    <audio id="bgm" loop>
+        <source src="bgm.mp3" type="audio/mp3">
+    </audio>
+
+    <div class="brand-bar">
+        <div class="brand-logo">XHGD · SNOWFLAKE KINGDOM</div>
+    </div>
+
     <div class="magic-dock">
-        <a href="javascript:navTo('certificate.html')" class="dock-btn" title="荣誉证书">📜</a>
-        <a href="javascript:navTo('mission.html')" class="dock-btn" title="绝密任务">💌</a>
-        <a href="javascript:navTo('magic.html')" class="dock-btn" title="魔法中心">🎄</a>
+        <a href="javascript:navTo('certificate.html')" class="dock-btn" title="证书">📜</a>
+        <a href="javascript:navTo('mission.html')" class="dock-btn" title="任务">💌</a>
     </div>
 
     <div id="cinema-intro">
         <div class="intro-text" id="typewriter-area"></div>
-        <div class="tap-hint" id="tap-hint">👆 点击屏幕 接入信号</div>
+        <button class="decrypt-btn" id="tap-hint">
+            ▼ TAP TO DECRYPT <br> <span style="font-size:0.8rem; opacity:0.8">点击解封北极密讯</span>
+        </button>
     </div>
 
     <div id="main-stage">
         <div id="aurora-bg"></div>
         <div id="snow-container"></div>
 
-        <div class="min-h-screen flex flex-col justify-center items-center p-6 relative z-10">
-            <h1 class="text-6xl md:text-8xl font-bold mb-4 gold-text" style="font-family: 'Ma Shan Zheng', cursive;">圣诞快乐</h1>
-            <div class="text-sm tracking-[0.5em] text-yellow-100/60 mb-12 font-serif uppercase">The Snowflake Kingdom</div>
-            
-            <button onclick="navTo('certificate.html')" class="hero-btn">
-                开启旅程
-            </button>
-            
-            <div class="absolute bottom-10 animate-bounce opacity-50 text-yellow-500">
-                ↓ 下滑查看视频信件
-            </div>
+        <div class="video-wrapper">
+            <video id="santaVideo" playsinline poster="poster_xhgd.jpg" webkit-playsinline>
+                <source src="santa_video.mp4" type="video/mp4">
+            </video>
         </div>
 
-        <div class="footer">
-            <p class="text-slate-500 text-xs tracking-widest mb-4">ENCRYPTED SIGNAL FROM NORTH POLE</p>
-            <div class="video-box">
-                <video controls playsinline width="100%" poster="poster.jpg">
-                    <source src="santa_video.mp4" type="video/mp4">
-                    您的浏览器不支持视频播放。
-                </video>
+        <div class="main-content">
+            <h1 class="text-4xl font-bold mb-2 gold-text" style="font-family: 'Ma Shan Zheng', cursive;">圣诞快乐</h1>
+            <div class="text-xs tracking-[0.3em] text-yellow-100/60 mb-8 font-serif uppercase">
+                Encrypted Signal Verified
             </div>
-            <p class="text-slate-600 text-xs mt-4">SYSTEM ID: 2025-XMAS-OP</p>
+            
+            <button onclick="navTo('certificate.html')" class="text-yellow-500 border-b border-yellow-500 pb-1 text-sm opacity-60">
+                跳过视频，直接领取证书 &rarr;
+            </button>
         </div>
     </div>
 
     <script type="module">
         import { Renderer, Program, Mesh, Color, Triangle } from 'https://cdn.skypack.dev/ogl';
         
-        // --- 1. 参数解析与导航系统 ---
+        // --- 1. 参数系统 ---
         const params = new URLSearchParams(window.location.search);
-        // 如果URL没有名字，默认为“宝贝”
         const name = params.get('name') || '宝贝'; 
         const lang = params.get('lang') || 'zh';
-
-        // 挂载到 window 对象供 HTML onclick 调用
         window.navTo = function(page) {
             window.location.href = `${page}?name=${encodeURIComponent(name)}&lang=${lang}`;
         }
 
-        // --- 2. 语音合成系统 (Text to Speech) ---
-        const synth = window.speechSynthesis;
-        function speak(text) {
-            // 停止之前的播放
-            synth.cancel(); 
-            const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = lang === 'zh' ? 'zh-CN' : 'en-US';
-            utterance.rate = 0.9; // 语速稍微慢一点，更有仪式感
-            utterance.pitch = 1.0;
-            synth.speak(utterance);
-        }
+        // --- 2. 文本内容 ---
+        const introText = `SYSTEM ID: 2025-XHGD\nTo: ${name}\n\n检测到加密的北极信号...\n来源：Snowflake Kingdom (雪花国度)\n\n请求接入许可...`;
 
-        // --- 3. 文案配置 ---
-        const introText = lang === 'zh' 
-            ? `亲爱的 ${name}：\n\n我是来自北极的信使。\n监测到你在2025年的优异表现，\n圣诞老人特派我为你送来礼物。\n\n准备好进入雪花国度了吗？` 
-            : `Dear ${name},\nMessenger from North Pole here.\nWe detected your amazing spirit in 2025!\nA gift awaits you.\nReady to enter the Snowflake Kingdom?`;
-        
-        const audioText = lang === 'zh' 
-            ? `亲爱的${name}，圣诞快乐。我是来自北极的信使。监测到你在2025年的优异表现，特来给你赠送圣诞礼物。准备好进入雪花国度了吗？`
-            : `Hello ${name}, Merry Christmas. I am the messenger from the North Pole. Ready for your gift?`;
-
-        // --- 4. 打字机特效逻辑 ---
+        // --- 3. 打字机逻辑 ---
         const typeArea = document.getElementById('typewriter-area');
-        const hint = document.getElementById('tap-hint');
+        const hintBtn = document.getElementById('tap-hint');
         let charIndex = 0;
         
         function typeWriter() {
@@ -217,133 +223,91 @@
                 const char = introText.charAt(charIndex);
                 typeArea.innerHTML += char === '\n' ? '<br>' : char;
                 charIndex++;
-                // 打字速度随机化，模拟真实打字
-                setTimeout(typeWriter, Math.random() * 50 + 50);
+                setTimeout(typeWriter, 40);
             } else {
-                // 打字结束，显示提示按钮
-                hint.style.opacity = 1;
+                gsap.to(hintBtn, {opacity: 1, duration: 1});
             }
         }
-        // 延迟500ms开始打字
         setTimeout(typeWriter, 500);
 
-        // --- 5. 核心交互：用户点击 (解锁音频 & 转场) ---
-        // 必须通过用户交互才能在iOS上播放声音和视频
-        document.getElementById('cinema-intro').addEventListener('click', () => {
-            
-            // A. 解锁音频上下文
-            const unlock = new SpeechSynthesisUtterance('');
-            synth.speak(unlock);
+        // --- 4. 核心交互 (点击解封) ---
+        const santaVideo = document.getElementById('santaVideo');
+        const bgm = document.getElementById('bgm');
 
-            // B. 播放欢迎语
+        // 视频播放结束监听 -> 自动跳转
+        santaVideo.addEventListener('ended', () => {
+            // 视频结束后，延迟1秒跳转，给用户一点反应时间
             setTimeout(() => {
-                speak(audioText);
-            }, 300);
-
-            // C. 视觉转场动画 (GSAP)
-            gsap.to("#cinema-intro", { 
-                opacity: 0, 
-                duration: 1.5, 
-                pointerEvents: "none",
-                onComplete: () => { document.getElementById('cinema-intro').style.display = 'none'; }
-            });
-            gsap.to("#main-stage", { opacity: 1, duration: 2, delay: 0.5 });
-            
-            // D. 启动极光 WebGL
-            initAurora();
+                navTo('certificate.html');
+            }, 800);
         });
 
-        // --- 6. 极光背景特效 (WebGL) ---
+        hintBtn.addEventListener('click', () => {
+            // A. 播放BGM (必须在点击事件中触发)
+            bgm.volume = 0.3; // 声音不要太大，以免盖过视频
+            bgm.play().catch(e => console.log('Audio play failed', e));
+
+            // B. 转场动画
+            gsap.to("#cinema-intro", { 
+                opacity: 0, duration: 1, pointerEvents: "none",
+                onComplete: () => { document.getElementById('cinema-intro').style.display = 'none'; }
+            });
+            gsap.to("#main-stage", { opacity: 1, duration: 1.5 });
+            
+            // C. 启动极光
+            initAurora();
+
+            // D. 播放视频 (延迟一点点，等转场开始)
+            setTimeout(() => {
+                santaVideo.play().then(() => {
+                    // 视频开始播放后，淡出BGM或者保持低音量
+                }).catch(e => {
+                    // 如果自动播放失败（浏览器策略），显示播放按钮
+                    santaVideo.controls = true;
+                });
+            }, 500);
+        });
+
+        // --- 5. 极光背景 (WebGL) ---
         function initAurora() {
             const ctn = document.getElementById('aurora-bg');
-            if(ctn.children.length > 0) return; // 防止重复创建
-            
-            const renderer = new Renderer({alpha: true, dpr: 1}); // dpr:1 提升性能
+            if(ctn.children.length > 0) return;
+            const renderer = new Renderer({alpha: true, dpr: 1});
             const gl = renderer.gl; 
             ctn.appendChild(gl.canvas);
-            
-            // 简单的噪声着色器
             const program = new Program(gl, {
                 vertex: `#version 300 es
-                in vec2 position;
-                void main(){ gl_Position = vec4(position, 0.0, 1.0); }`,
+                in vec2 position; void main(){ gl_Position = vec4(position, 0.0, 1.0); }`,
                 fragment: `#version 300 es
-                precision highp float;
-                uniform float uTime;
-                uniform vec2 uResolution;
-                out vec4 fragColor;
-                
-                // 伪随机函数
-                float random (in vec2 st) {
-                    return fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453123);
-                }
-                
-                // 噪声函数
-                float noise (in vec2 st) {
-                    vec2 i = floor(st);
-                    vec2 f = fract(st);
-                    float a = random(i);
-                    float b = random(i + vec2(1.0, 0.0));
-                    float c = random(i + vec2(0.0, 1.0));
-                    float d = random(i + vec2(1.0, 1.0));
-                    vec2 u = f * f * (3.0 - 2.0 * f);
-                    return mix(a, b, u.x) + (c - a)* u.y * (1.0 - u.x) + (d - b) * u.x * u.y;
-                }
-
+                precision highp float; uniform float uTime; uniform vec2 uResolution; out vec4 fragColor;
+                float random (in vec2 st) { return fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453123); }
+                float noise (in vec2 st) { vec2 i = floor(st); vec2 f = fract(st); float a = random(i); float b = random(i + vec2(1.0, 0.0)); float c = random(i + vec2(0.0, 1.0)); float d = random(i + vec2(1.0, 1.0)); vec2 u = f * f * (3.0 - 2.0 * f); return mix(a, b, u.x) + (c - a)* u.y * (1.0 - u.x) + (d - b) * u.x * u.y; }
                 void main() {
                     vec2 uv = gl_FragCoord.xy / uResolution;
-                    // 制造流动的极光效果
                     float n = noise(uv * 3.0 + vec2(uTime * 0.1, uTime * 0.2));
                     float alpha = smoothstep(0.4, 0.8, n);
-                    // 绿色带一点蓝
-                    vec3 color = vec3(0.1, 0.8, 0.6);
-                    fragColor = vec4(color, alpha * 0.4); 
+                    vec3 color = vec3(0.05, 0.4, 0.3); // 深绿极光
+                    fragColor = vec4(color, alpha * 0.3); 
                 }`,
-                uniforms: { 
-                    uTime: { value: 0 }, 
-                    uResolution: { value: [window.innerWidth, window.innerHeight] } 
-                }
+                uniforms: { uTime: { value: 0 }, uResolution: { value: [window.innerWidth, window.innerHeight] } }
             });
-            
             const mesh = new Mesh(gl, { geometry: new Triangle(gl), program });
-            
-            function resize() {
-                renderer.setSize(window.innerWidth, window.innerHeight);
-                program.uniforms.uResolution.value = [window.innerWidth, window.innerHeight];
-            }
-            window.addEventListener('resize', resize); 
-            resize();
-            
-            requestAnimationFrame(function update(t) {
-                program.uniforms.uTime.value = t * 0.001;
-                renderer.render({ scene: mesh });
-                requestAnimationFrame(update);
-            });
+            function resize() { renderer.setSize(window.innerWidth, window.innerHeight); program.uniforms.uResolution.value = [window.innerWidth, window.innerHeight]; }
+            window.addEventListener('resize', resize); resize();
+            requestAnimationFrame(function update(t) { program.uniforms.uTime.value = t * 0.001; renderer.render({ scene: mesh }); requestAnimationFrame(update); });
         }
         
-        // --- 7. 雪花粒子系统 ---
+        // --- 6. 雪花 ---
         const snowCtn = document.getElementById('snow-container');
-        // 每200ms生成一片雪花
         setInterval(() => {
-            if(document.hidden) return; // 页面切后台时不生成，节省性能
-            const f = document.createElement('div');
-            f.className = 'snowflake';
-            // 随机大小
+            if(document.hidden) return;
+            const f = document.createElement('div'); f.className = 'snowflake';
             const s = Math.random() * 3 + 2 + 'px';
-            f.style.width = s;
-            f.style.height = s;
-            // 随机位置
-            f.style.left = Math.random() * 100 + 'vw';
-            // 随机下落时间 (5s - 10s)
-            f.style.animationDuration = Math.random() * 5 + 5 + 's';
-            // 随机透明度
-            f.style.opacity = Math.random() * 0.5 + 0.3;
-            
+            f.style.width = s; f.style.height = s; f.style.left = Math.random() * 100 + 'vw';
+            f.style.animationDuration = Math.random() * 5 + 5 + 's'; f.style.opacity = Math.random() * 0.5 + 0.3;
             snowCtn.appendChild(f);
-            
-            // 10秒后自动删除DOM，防止内存泄漏
             setTimeout(() => f.remove(), 10000);
-        }, 200);
+        }, 300);
     </script>
 </body>
 </html>
