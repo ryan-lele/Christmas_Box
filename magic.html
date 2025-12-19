@@ -3,45 +3,101 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Magic Gift V16.0 (Sound Btn)</title>
+    <title>The Frozen Gift</title>
+    <script src="https://cdn.bootcdn.net/ajax/libs/tailwindcss/3.3.3/cdn.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Noto+Serif+SC:wght@700&display=swap" rel="stylesheet">
     
     <style>
-        body { margin: 0; overflow: hidden; background: radial-gradient(circle at center, #001020 0%, #000000 100%); touch-action: none; font-family: 'Courier New', sans-serif; -webkit-user-select: none; user-select: none; }
+        /* --- 核心环境设置 --- */
+        body { 
+            margin: 0; overflow: hidden; 
+            background: radial-gradient(circle at center, #0f172a 0%, #000000 100%); 
+            touch-action: none; 
+            font-family: 'Noto Serif SC', serif; 
+            -webkit-user-select: none; user-select: none; 
+        }
         #canvas-container { position: absolute; inset: 0; z-index: 1; }
         #ui-layer { position: absolute; inset: 0; z-index: 10; pointer-events: none; }
         
-        /* 启动遮罩 */
+        /* --- 启动遮罩 (Start Screen) --- */
         #start-overlay {
-            position: fixed; inset: 0; background: rgba(0,5,10,0.98); z-index: 999;
+            position: fixed; inset: 0; background: rgba(2, 6, 23, 0.95); z-index: 999;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
-            transition: opacity 0.5s;
+            transition: opacity 0.8s;
+            backdrop-filter: blur(10px);
         }
         .start-btn {
-            padding: 15px 40px; font-size: 18px; color: #fff; background: transparent;
-            border: 2px solid #00bfff; border-radius: 50px; 
-            box-shadow: 0 0 20px #00bfff; animation: pulse 2s infinite; cursor: pointer;
+            padding: 16px 48px; font-size: 1.2rem; color: #ffd700; 
+            background: linear-gradient(to bottom, #8b0000, #5a0000);
+            border: 1px solid #ffd700; border-radius: 50px; 
+            font-family: 'Cinzel', serif; letter-spacing: 2px;
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.3); 
+            animation: pulse 2s infinite; cursor: pointer;
+            text-transform: uppercase;
         }
-        @keyframes pulse { 50% { box-shadow: 0 0 40px #00bfff; } }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); box-shadow: 0 0 50px rgba(255, 215, 0, 0.6); } }
 
-        /* 顶部音频按钮 */
-        .sound-toggle-btn {
-            position: absolute; top: 15px; left: 15px; pointer-events: auto;
-            border: 1px solid #00ffea; color: #00ffea; background: rgba(0,50,50,0.5);
-            padding: 8px 12px; font-size: 12px; border-radius: 4px; display: flex; align-items: center; gap: 5px;
+        /* --- UI 元素 --- */
+        h1 { 
+            position: absolute; top: 8%; width: 100%; text-align: center; 
+            color: #d4af37; font-family: 'Cinzel', serif; font-size: 2rem; 
+            text-shadow: 0 2px 10px rgba(0,0,0,0.8); pointer-events: none;
         }
-        .sound-toggle-btn:active { background: #00ffea; color: #000; }
+        
+        /* 侧边装饰栏 */
+        .left-dock { 
+            position: absolute; left: 20px; top: 50%; transform: translateY(-50%); 
+            display: flex; flex-direction: column; gap: 20px; pointer-events: auto; 
+        }
+        .deco-btn { 
+            width: 48px; height: 48px; border-radius: 50%; 
+            background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(5px);
+            border: 1px solid rgba(212, 175, 55, 0.3); 
+            color: #fff; font-size: 24px; 
+            display: flex; justify-content: center; align-items: center; 
+            cursor: pointer; transition: transform 0.2s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+        .deco-btn:active { transform: scale(0.9); background: rgba(212, 175, 55, 0.2); }
 
-        /* UI 元素 */
-        h1 { position: absolute; top: 8%; width: 100%; text-align: center; color: #e0f7fa; font-size: 28px; text-shadow: 0 0 10px #00bfff; opacity: 0.9; margin: 0; }
-        .left-dock { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 15px; pointer-events: auto; }
-        .deco-btn { width: 44px; height: 44px; border-radius: 50%; background: rgba(0, 20, 40, 0.6); border: 1px solid rgba(135, 206, 250, 0.4); color: #fff; font-size: 22px; display: flex; justify-content: center; align-items: center; cursor: pointer; }
-        .bottom-panel { position: absolute; bottom: max(30px, env(safe-area-inset-bottom)); width: 100%; text-align: center; pointer-events: auto; display: flex; flex-direction: column; gap: 12px; align-items: center;}
-        .btn-photo { background: rgba(0, 80, 200, 0.4); border: 1px solid #87cefa; color: #e0ffff; padding: 10px 30px; border-radius: 30px; font-weight: bold; display: inline-block; }
-        .instruction { font-size: 12px; color: #aaddee; background: rgba(0,0,0,0.6); padding: 6px 16px; border-radius: 15px; }
+        /* 底部操作区 */
+        .bottom-panel { 
+            position: absolute; bottom: max(40px, env(safe-area-inset-bottom)); 
+            width: 100%; text-align: center; pointer-events: auto; 
+            display: flex; flex-direction: column; gap: 15px; align-items: center;
+        }
+        
+        .btn-photo { 
+            background: linear-gradient(90deg, rgba(212, 175, 55, 0.1), rgba(212, 175, 55, 0.3)); 
+            border: 1px solid #d4af37; color: #ffd700; 
+            padding: 12px 30px; border-radius: 30px; 
+            font-weight: bold; font-family: 'Noto Serif SC', serif;
+            display: inline-flex; align-items: center; gap: 8px;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.1);
+        }
+        
+        .instruction { 
+            font-size: 11px; color: #94a3b8; letter-spacing: 1px;
+            background: rgba(0,0,0,0.7); padding: 8px 16px; border-radius: 20px; 
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
         #file-input { display: none; }
+        
+        /* 暴风雪闪光特效 */
         #flash-fx { position: fixed; inset:0; background: #fff; opacity:0; pointer-events:none; z-index:20; transition: opacity 0.2s; }
-        .top-right { position: absolute; top: 20px; right: 20px; pointer-events: auto; }
-        .back-link { color: #87cefa; text-decoration: none; font-size: 12px; border: 1px solid #87cefa; padding: 5px 10px; background: rgba(0,0,0,0.5); }
+        
+        /* 顶部导航 */
+        .top-right { position: absolute; top: 20px; right: 20px; pointer-events: auto; display: flex; gap: 10px; }
+        .nav-link { 
+            color: #94a3b8; text-decoration: none; font-size: 10px; 
+            border: 1px solid rgba(255,255,255,0.2); padding: 6px 12px; border-radius: 20px;
+            background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
+        }
+        
+        /* 音量图标 */
+        .sound-icon { font-size: 14px; opacity: 0.5; animation: spin 4s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
     </style>
 
     <script type="importmap">
@@ -50,20 +106,27 @@
 </head>
 <body>
 
+    <audio id="bgm" loop>
+        <source src="bgm.mp3" type="audio/mp3">
+    </audio>
+
     <div id="canvas-container"></div>
     <div id="flash-fx"></div>
 
     <div id="start-overlay">
-        <h2 style="color:#e0ffff; margin-bottom:30px; font-family:serif; letter-spacing:2px;">THE FROZEN GIFT</h2>
-        <button class="start-btn" id="btn-start">❄️ 开启魔法 ❄️</button>
-        <p style="color:#557799; font-size:12px; margin-top:20px;">Sound & Gyroscope Required</p>
+        <h2 style="color:#ffd700; margin-bottom:10px; font-family:'Cinzel',serif; font-size: 2rem;">THE FROZEN GIFT</h2>
+        <p style="color:#94a3b8; margin-bottom:40px; font-size: 0.8rem; letter-spacing: 2px;">SNOWFLAKE KINGDOM</p>
+        <button class="start-btn" id="btn-start">✨ 开启魔法 ✨</button>
+        <p style="color:#475569; font-size:10px; margin-top:30px; opacity: 0.6;">Requires Sound & Motion</p>
     </div>
 
     <div id="ui-layer">
-        <button class="sound-toggle-btn" onclick="forceAudio()">🔊 SOUND CHECK</button>
-
         <h1>Merry Christmas</h1>
-        <div class="top-right"><a href="mission.html" class="back-link">EXIT</a></div>
+        
+        <div class="top-right">
+            <div class="nav-link"><span class="sound-icon">🎵</span></div>
+            <a href="index.html" class="nav-link">HOME</a>
+        </div>
         
         <div class="left-dock">
             <div class="deco-btn" onclick="addDeco('STAR'); playSound('ding')">★</div>
@@ -73,8 +136,11 @@
         </div>
         
         <div class="bottom-panel">
-            <label class="btn-photo">📷 上传照片<input type="file" id="file-input" multiple accept="image/*"></label>
-            <div class="instruction" id="status-text">👉右滑:老人 | 👈左滑:麋鹿 | ✊摇一摇:暴风雪</div>
+            <label class="btn-photo">
+                <span>📷</span> 上传合影 封存记忆
+                <input type="file" id="file-input" multiple accept="image/*">
+            </label>
+            <div class="instruction" id="status-text">滑动屏幕呼唤麋鹿 | 摇晃手机召唤风雪</div>
         </div>
     </div>
 
@@ -85,39 +151,32 @@
         import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 
         const STATE = { mode: 'TREE', gyro: { x: 0, y: 0 }, autoRotate: true, blizzardIntensity: 0 };
-        const CONFIG = { tree: { count: 1600, height: 26, radius: 9 } };
+        const CONFIG = { tree: { count: 1800, height: 28, radius: 10 } }; // 增加粒子数量
         let scene, camera, renderer, composer, mainGroup, treeGroup, photoGroup, snowSystem;
         let particles = [], flyingObjects = [], clock = new THREE.Clock(), textures = {}; 
         let audioCtx = null;
+        const bgmElement = document.getElementById('bgm');
 
-        // --- 音频核心 ---
+        // --- 音频系统 (Web Audio API + HTML Audio) ---
         function initAudio() {
+            // 1. 播放 BGM
+            bgmElement.volume = 0.4; // 背景音乐音量适中
+            bgmElement.play().catch(e => console.log("BGM Autoplay prevented"));
+
+            // 2. 初始化音效上下文 (用于生成交互音效)
             try {
                 const AudioContext = window.AudioContext || window.webkitAudioContext;
                 audioCtx = new AudioContext();
-                // 播放一段静音以解锁
                 const buffer = audioCtx.createBuffer(1, 1, 22050);
                 const source = audioCtx.createBufferSource();
                 source.buffer = buffer;
                 source.connect(audioCtx.destination);
                 source.start(0);
-            } catch(e) { console.error("Audio Init Failed", e); }
+            } catch(e) { console.error("SFX Init Failed", e); }
         }
 
-        // 手动强制唤醒音频
-        window.forceAudio = function() {
-            if(!audioCtx) initAudio();
-            if(audioCtx && audioCtx.state === 'suspended') {
-                audioCtx.resume().then(() => {
-                    playSound('ding'); // 成功提示音
-                    alert("音频已激活！(Audio Active)");
-                });
-            } else {
-                playSound('ding'); // 如果已经是好的，就响一声
-            }
-        }
-
-        function playSound(type) {
+        // 生成柔和的音效 (不再是刺耳的蜂鸣)
+        window.playSound = function(type) {
             if(!audioCtx) return;
             const now = audioCtx.currentTime;
             const osc = audioCtx.createOscillator();
@@ -125,89 +184,105 @@
             osc.connect(gain); gain.connect(audioCtx.destination);
 
             if (type === 'ding') {
-                osc.type = 'sine'; osc.frequency.setValueAtTime(880, now); osc.frequency.exponentialRampToValueAtTime(100, now + 0.6);
-                gain.gain.setValueAtTime(0.5, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.6);
-                osc.start(now); osc.stop(now + 0.6);
+                // 星星音效：高频正弦波
+                osc.type = 'sine'; osc.frequency.setValueAtTime(1200, now); osc.frequency.exponentialRampToValueAtTime(400, now + 0.8);
+                gain.gain.setValueAtTime(0.1, now); gain.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
+                osc.start(now); osc.stop(now + 0.8);
             } else if (type === 'bell') {
-                osc.type = 'triangle'; osc.frequency.setValueAtTime(2000, now);
-                gain.gain.setValueAtTime(0.3, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 1.2);
-                osc.start(now); osc.stop(now + 1.2);
+                // 铃铛音效
+                osc.type = 'triangle'; osc.frequency.setValueAtTime(3000, now);
+                gain.gain.setValueAtTime(0.05, now); gain.gain.exponentialRampToValueAtTime(0.001, now + 1.5);
+                osc.start(now); osc.stop(now + 1.5);
             } else if (type === 'pop') {
-                osc.type = 'square'; osc.frequency.setValueAtTime(400, now);
-                gain.gain.setValueAtTime(0.2, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
-                osc.start(now); osc.stop(now + 0.15);
+                // 气泡音效
+                osc.type = 'sine'; osc.frequency.setValueAtTime(600, now); osc.frequency.exponentialRampToValueAtTime(100, now + 0.1);
+                gain.gain.setValueAtTime(0.1, now); gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+                osc.start(now); osc.stop(now + 0.1);
             } else if (type === 'whoosh') {
+                // 风声 (白噪声)
                 const bufferSize = audioCtx.sampleRate * 2.0;
                 const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
                 const data = buffer.getChannelData(0);
-                for (let i = 0; i < bufferSize; i++) data[i] = (Math.random() * 2 - 1) * 0.5;
+                for (let i = 0; i < bufferSize; i++) data[i] = (Math.random() * 2 - 1) * 0.2; // 降低音量
                 const noise = audioCtx.createBufferSource();
                 noise.buffer = buffer;
                 const noiseGain = audioCtx.createGain();
                 noise.connect(noiseGain); noiseGain.connect(audioCtx.destination);
                 noiseGain.gain.setValueAtTime(0, now);
-                noiseGain.gain.linearRampToValueAtTime(0.4, now + 0.5);
+                noiseGain.gain.linearRampToValueAtTime(0.2, now + 0.5);
                 noiseGain.gain.linearRampToValueAtTime(0, now + 2.0);
                 noise.start(now);
             }
         }
 
-        // --- 资源 ---
+        // --- 资源加载 ---
         function createResources() {
-            const c=document.createElement('canvas'); c.width=32; c.height=32;
+            const c=document.createElement('canvas'); c.width=64; c.height=64;
             const ctx=c.getContext('2d');
-            const g=ctx.createRadialGradient(16,16,0,16,16,16); g.addColorStop(0,'rgba(255,255,255,1)'); g.addColorStop(0.4,'rgba(100,200,255,0.4)'); g.addColorStop(1,'rgba(0,0,0,0)');
-            ctx.fillStyle=g; ctx.fillRect(0,0,32,32); textures.glow = new THREE.CanvasTexture(c);
+            // 更柔和的粒子光晕
+            const g=ctx.createRadialGradient(32,32,0,32,32,32); 
+            g.addColorStop(0,'rgba(255,255,240,1)'); // 暖白
+            g.addColorStop(0.2,'rgba(255,215,0,0.6)'); // 金色光晕
+            g.addColorStop(1,'rgba(0,0,0,0)');
+            ctx.fillStyle=g; ctx.fillRect(0,0,64,64); textures.glow = new THREE.CanvasTexture(c);
 
             textures.getEmoji=(e,s=64)=>{
                 const ec=document.createElement('canvas'); ec.width=s; ec.height=s;
-                const et=ec.getContext('2d'); et.font=`${s*0.75}px serif`; et.textAlign='center'; et.textBaseline='middle'; et.fillText(e,s/2,s/2+2);
+                const et=ec.getContext('2d'); et.font=`${s*0.75}px serif`; et.textAlign='center'; et.textBaseline='middle'; et.fillText(e,s/2,s/2+5);
                 return new THREE.CanvasTexture(ec);
             }
             textures.snow=textures.getEmoji('❄️'); textures.bell=textures.getEmoji('🔔'); 
             textures.santa=textures.getEmoji('🎅',128); textures.deer=textures.getEmoji('🦌',128);
         }
 
-        // --- 初始化 ---
+        // --- 场景初始化 ---
         function init() {
             createResources();
-            scene=new THREE.Scene(); scene.fog=new THREE.FogExp2(0x000510,0.02);
-            camera=new THREE.PerspectiveCamera(45,window.innerWidth/window.innerHeight,0.1,1000); camera.position.set(0,5,45);
+            scene=new THREE.Scene(); scene.fog=new THREE.FogExp2(0x000510,0.025);
+            camera=new THREE.PerspectiveCamera(50,window.innerWidth/window.innerHeight,0.1,1000); camera.position.set(0,8,50); // 调整相机视角
+            
             renderer=new THREE.WebGLRenderer({antialias:false,alpha:true});
-            renderer.setSize(window.innerWidth,window.innerHeight); renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+            renderer.setSize(window.innerWidth,window.innerHeight); 
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
             renderer.toneMapping=THREE.ReinhardToneMapping;
             document.getElementById('canvas-container').appendChild(renderer.domElement);
 
+            // 后处理 (Bloom)
             const rp=new RenderPass(scene,camera);
             const bp=new UnrealBloomPass(new THREE.Vector2(window.innerWidth,window.innerHeight),1.5,0.4,0.85);
-            bp.threshold=0.1; bp.strength=1.8; bp.radius=0.5;
+            bp.threshold=0; bp.strength=1.2; bp.radius=0.8; // 调整发光参数，更梦幻
             composer=new EffectComposer(renderer); composer.addPass(rp); composer.addPass(bp);
 
-            scene.add(new THREE.AmbientLight(0x404040,2));
-            const l=new THREE.PointLight(0x00bfff,3,100); l.position.set(0,10,20); scene.add(l);
+            scene.add(new THREE.AmbientLight(0x404040,3));
+            const l=new THREE.PointLight(0xffd700,2,100); l.position.set(0,10,20); scene.add(l); // 暖光
 
             mainGroup=new THREE.Group(); scene.add(mainGroup);
             treeGroup=new THREE.Group(); mainGroup.add(treeGroup);
             photoGroup=new THREE.Group(); mainGroup.add(photoGroup);
 
             buildTree(); buildSnow(); createDefaultPhoto(); setupEvents(); animate();
-            window.addDeco=addDeco; window.playSound=playSound;
+            window.addDeco=addDeco; 
         }
 
-        // --- 逻辑 ---
+        // --- 核心逻辑 ---
         function buildTree() {
-            const geo=new THREE.TetrahedronGeometry(0.3,0);
-            const matM=new THREE.MeshStandardMaterial({color:0x87cefa,roughness:0.1,metalness:0.8,emissive:0x002244});
+            const geo=new THREE.TetrahedronGeometry(0.4,0);
+            const matM=new THREE.MeshStandardMaterial({color:0x22c55e,roughness:0.2,metalness:0.5,emissive:0x004400}); // 绿色树体
             const matS=new THREE.SpriteMaterial({map:textures.glow,color:0xffffff,transparent:true,blending:THREE.AdditiveBlending});
+            
             for(let i=0; i<CONFIG.tree.count; i++) {
-                const isSprite=Math.random()>0.7;
+                const isSprite=Math.random()>0.6;
                 const t=Math.random(); const h=CONFIG.tree.height; const r=CONFIG.tree.radius*(1-t);
                 const y=t*h-h/2+2; const a=Math.random()*Math.PI*2;
                 const pos=new THREE.Vector3(Math.cos(a)*r,y,Math.sin(a)*r);
+                
                 let item;
-                if(isSprite){ item=new THREE.Sprite(matS.clone()); item.scale.setScalar(0.5+Math.random()); }
-                else{ item=new THREE.Mesh(geo,matM.clone()); item.scale.setScalar(0.4+Math.random()*0.6); item.rotation.set(Math.random()*6,Math.random()*6,0); }
+                if(isSprite){ item=new THREE.Sprite(matS.clone()); item.scale.setScalar(0.4+Math.random()*0.6); }
+                else{ item=new THREE.Mesh(geo,matM.clone()); item.scale.setScalar(0.3+Math.random()*0.5); item.rotation.set(Math.random()*6,Math.random()*6,0); }
+                
                 item.position.copy(pos); treeGroup.add(item);
+                
+                // 爆炸逻辑预计算
                 const len=15+Math.random()*30; const phi=Math.acos(-1+(2*i)/CONFIG.tree.count); const theta=Math.sqrt(CONFIG.tree.count*Math.PI)*phi;
                 particles.push({mesh:item, basePos:pos.clone(), scatterPos:new THREE.Vector3(len*Math.cos(theta)*Math.sin(phi), len*Math.sin(theta)*Math.sin(phi), len*Math.cos(phi)), isDeco:false});
             }
@@ -217,13 +292,14 @@
             let map, s=2.5, c=0xffffff;
             if(type==='BELL'){map=textures.bell;s=3.0;} else if(type==='GIFT')map=textures.getEmoji('🎁');
             else if(type==='SOCK')map=textures.getEmoji('🧦'); else map=null; 
+            
             let item;
             if(type==='STAR'){
-                item=new THREE.Mesh(new THREE.OctahedronGeometry(1.5),new THREE.MeshStandardMaterial({color:0xffaa00,emissive:0xff8800,emissiveIntensity:2}));
+                item=new THREE.Mesh(new THREE.OctahedronGeometry(2),new THREE.MeshStandardMaterial({color:0xffaa00,emissive:0xffd700,emissiveIntensity:3}));
                 item.position.set(0,CONFIG.tree.height/2+3,0);
             } else {
                 item=new THREE.Sprite(new THREE.SpriteMaterial({map:map,color:c})); item.scale.setScalar(s);
-                const t=Math.random(); const r=CONFIG.tree.radius*(1-t)+1.2; const y=t*CONFIG.tree.height-CONFIG.tree.height/2+2; const a=Math.random()*Math.PI*2;
+                const t=Math.random(); const r=CONFIG.tree.radius*(1-t)+1.5; const y=t*CONFIG.tree.height-CONFIG.tree.height/2+2; const a=Math.random()*Math.PI*2;
                 item.position.set(Math.cos(a)*r,y,Math.sin(a)*r);
             }
             treeGroup.add(item);
@@ -233,25 +309,33 @@
         function spawnFlyingUnit(type) {
             playSound('whoosh');
             const isSanta=type==='SANTA'; const tex=isSanta?textures.santa:textures.deer; const dir=isSanta?1:-1;
-            const s=new THREE.Sprite(new THREE.SpriteMaterial({map:tex,color:0xffffff})); s.scale.setScalar(6);
-            s.position.set(-40*dir, 5+Math.random()*10, 15); scene.add(s);
-            flyingObjects.push({mesh:s, dir:dir, speed:25+Math.random()*5});
-            const st=document.getElementById('status-text'); st.innerText=isSanta?"🎅 圣诞老人来啦！":"🦌 麋鹿飞过！";
-            setTimeout(()=>st.innerText="👉右滑:老人 | 👈左滑:麋鹿 | ✊摇一摇:暴风雪",2500);
+            const s=new THREE.Sprite(new THREE.SpriteMaterial({map:tex,color:0xffffff})); s.scale.setScalar(8);
+            s.position.set(-50*dir, 8+Math.random()*8, 20); scene.add(s);
+            flyingObjects.push({mesh:s, dir:dir, speed:30+Math.random()*10});
+            
+            const st=document.getElementById('status-text'); 
+            st.innerText=isSanta?"🎅 圣诞老人正在派送礼物...":"🦌 麋鹿正在巡视北极...";
+            setTimeout(()=>st.innerText="滑动屏幕呼唤麋鹿 | 摇晃手机召唤风雪",3000);
         }
 
+        // --- 事件监听 ---
         function setupEvents() {
             window.addEventListener('resize',()=>{camera.aspect=window.innerWidth/window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth,window.innerHeight); composer.setSize(window.innerWidth,window.innerHeight);});
             
+            // 点击启动 (User Gesture)
             document.getElementById('btn-start').onclick=async()=>{
                 initAudio();
-                document.getElementById('start-overlay').style.opacity=0;
-                setTimeout(()=>document.getElementById('start-overlay').remove(),500);
+                const overlay = document.getElementById('start-overlay');
+                overlay.style.opacity=0;
+                overlay.style.pointerEvents='none'; // 防止遮挡
+                
+                // 陀螺仪权限 (iOS)
                 if(typeof DeviceOrientationEvent?.requestPermission==='function'){ try{await DeviceOrientationEvent.requestPermission();}catch(e){} }
-                window.addEventListener('deviceorientation',e=>{STATE.gyro.x=(e.gamma||0)*0.01; STATE.gyro.y=((e.beta||0)-45)*0.01;});
+                window.addEventListener('deviceorientation',e=>{STATE.gyro.x=(e.gamma||0)*0.02; STATE.gyro.y=((e.beta||0)-45)*0.02;});
                 window.addEventListener('devicemotion',handleShake);
             };
 
+            // 触摸手势 (Pinch & Swipe)
             let sx=0, sy=0, isPinch=false, sp=0;
             document.addEventListener('touchstart',e=>{
                 if(e.touches.length===1){sx=e.touches[0].clientX;sy=e.touches[0].clientY;isPinch=false;}
@@ -262,18 +346,23 @@
                 if(e.touches.length===2){
                     e.preventDefault();
                     const d=Math.hypot(e.touches[0].pageX-e.touches[1].pageX,e.touches[0].pageY-e.touches[1].pageY);
-                    if(d>sp+40){STATE.mode='SCATTER';STATE.autoRotate=false;document.getElementById('status-text').innerText="✨ 记忆重现 ✨";playSound('pop');}
-                    if(d<sp-40){STATE.mode='TREE';STATE.autoRotate=true;}
+                    if(d>sp+30){
+                        STATE.mode='SCATTER';STATE.autoRotate=false;
+                        document.getElementById('status-text').innerText="✨ 记忆光粒已展开 ✨";
+                        if(Math.random()>0.9) playSound('ding');
+                    }
+                    if(d<sp-30){STATE.mode='TREE';STATE.autoRotate=true;}
                 }
             },{passive:false});
 
             document.addEventListener('touchend',e=>{
                 if(!isPinch && e.changedTouches.length===1){
                     const ex=e.changedTouches[0].clientX;
-                    if(ex-sx>60)spawnFlyingUnit('SANTA'); else if(ex-sx<-60)spawnFlyingUnit('DEER');
+                    if(ex-sx>50)spawnFlyingUnit('SANTA'); else if(ex-sx<-50)spawnFlyingUnit('DEER');
                 }
             });
 
+            // 图片上传
             document.getElementById('file-input').addEventListener('change',e=>{
                 if(e.target.files[0]){
                     const r=new FileReader();
@@ -282,7 +371,7 @@
                         i.onload=()=>{
                             const t=new THREE.TextureLoader().load(v.target.result); t.colorSpace=THREE.SRGBColorSpace;
                             updatePhoto(t, i.width/i.height);
-                            document.getElementById('status-text').innerText="✨ 记忆已封存，双指张开查看 ✨";
+                            document.getElementById('status-text').innerText="✨ 已封存! 双指放大屏幕查看记忆 ✨";
                             playSound('ding');
                         }
                     }; r.readAsDataURL(e.target.files[0]);
@@ -293,7 +382,8 @@
         let lastShake=0;
         function handleShake(e){
             const acc=e.accelerationIncludingGravity; if(!acc)return;
-            if(Math.abs(acc.x)+Math.abs(acc.y)+Math.abs(acc.z)>30 && Date.now()-lastShake>1500){
+            // 降低阈值，更容易触发
+            if(Math.abs(acc.x)+Math.abs(acc.y)+Math.abs(acc.z)>25 && Date.now()-lastShake>2000){
                 lastShake=Date.now();
                 triggerBlizzard();
             }
@@ -301,34 +391,39 @@
 
         function triggerBlizzard() {
             STATE.blizzardIntensity=1.0; playSound('whoosh');
-            const f=document.getElementById('flash-fx'); f.style.opacity=0.8; setTimeout(()=>f.style.opacity=0,300);
-            document.getElementById('status-text').innerText="⚠️ 暴风雪警报 ⚠️";
-            if(navigator.vibrate)navigator.vibrate([100,50,100]);
+            const f=document.getElementById('flash-fx'); f.style.opacity=0.6; setTimeout(()=>f.style.opacity=0,500);
+            document.getElementById('status-text').innerText="❄️ 暴风雪魔法已生效！ ❄️";
+            if(navigator.vibrate)navigator.vibrate([50,50,50]);
         }
 
         function buildSnow() {
             const geo=new THREE.BufferGeometry(); const pos=[],vels=[];
-            for(let i=0;i<3000;i++){
-                pos.push((Math.random()-0.5)*100, (Math.random()-0.5)*100, (Math.random()-0.5)*100);
-                vels.push((Math.random()-0.5), -(Math.random()*0.5+0.5), (Math.random()-0.5));
+            for(let i=0;i<4000;i++){
+                pos.push((Math.random()-0.5)*120, (Math.random()-0.5)*120, (Math.random()-0.5)*120);
+                vels.push((Math.random()-0.5), -(Math.random()*0.8+0.5), (Math.random()-0.5));
             }
             geo.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));
             geo.setAttribute('velocity',new THREE.Float32BufferAttribute(vels,3));
-            snowSystem=new THREE.Points(geo,new THREE.PointsMaterial({map:textures.snow,color:0xffffff,size:1.2,transparent:true,opacity:0.6,depthWrite:false,blending:THREE.AdditiveBlending}));
+            snowSystem=new THREE.Points(geo,new THREE.PointsMaterial({map:textures.snow,color:0xffffff,size:1.0,transparent:true,opacity:0.8,depthWrite:false,blending:THREE.AdditiveBlending}));
             scene.add(snowSystem);
         }
 
         function createDefaultPhoto() {
             const c=document.createElement('canvas'); c.width=512; c.height=512;
-            const x=c.getContext('2d'); x.fillStyle='#000'; x.fillRect(0,0,512,512); x.strokeStyle='#00bfff'; x.lineWidth=10; x.strokeRect(10,10,492,492);
-            x.font='60px Arial'; x.fillStyle='#fff'; x.textAlign='center'; x.fillText("Merry Christmas",256,256);
+            const x=c.getContext('2d'); 
+            x.fillStyle='rgba(0,0,0,0.8)'; x.fillRect(0,0,512,512); 
+            x.strokeStyle='#d4af37'; x.lineWidth=15; x.strokeRect(20,20,472,472);
+            x.font='60px serif'; x.fillStyle='#fff'; x.textAlign='center'; 
+            x.fillText("Merry Christmas",256,220);
+            x.font='30px serif'; x.fillStyle='#d4af37';
+            x.fillText("Upload Photo Below",256,280);
             updatePhoto(new THREE.CanvasTexture(c),1);
         }
 
         function updatePhoto(tex, aspect) {
             if(photoGroup.children[0]) photoGroup.remove(photoGroup.children[0]);
-            const w=14*aspect;
-            const m=new THREE.Mesh(new THREE.PlaneGeometry(w,14),new THREE.MeshBasicMaterial({map:tex,side:THREE.DoubleSide,transparent:true,opacity:0}));
+            const w=16*aspect; // 稍微调大一点
+            const m=new THREE.Mesh(new THREE.PlaneGeometry(w,16),new THREE.MeshBasicMaterial({map:tex,side:THREE.DoubleSide,transparent:true,opacity:0}));
             photoGroup.add(m);
         }
 
@@ -337,40 +432,42 @@
             
             const isScatter=STATE.mode==='SCATTER';
             particles.forEach(p=>{
-                p.mesh.position.lerp(isScatter?p.scatterPos:p.basePos,4*dt);
+                // 粒子运动逻辑
+                p.mesh.position.lerp(isScatter?p.scatterPos:p.basePos,3*dt);
                 if(!isScatter && !p.isDeco){p.mesh.rotation.x+=dt;p.mesh.rotation.y+=dt;}
             });
 
-            if(STATE.autoRotate) mainGroup.rotation.y+=0.3*dt;
-            mainGroup.rotation.z=THREE.MathUtils.lerp(mainGroup.rotation.z,STATE.gyro.x,0.1);
-            mainGroup.rotation.x=THREE.MathUtils.lerp(mainGroup.rotation.x,STATE.gyro.y,0.1);
+            if(STATE.autoRotate) mainGroup.rotation.y+=0.2*dt;
+            // 陀螺仪跟随更平滑
+            mainGroup.rotation.z=THREE.MathUtils.lerp(mainGroup.rotation.z,STATE.gyro.x,0.05);
+            mainGroup.rotation.x=THREE.MathUtils.lerp(mainGroup.rotation.x,STATE.gyro.y,0.05);
 
             if(photoGroup.children[0]){
                 const m=photoGroup.children[0].material;
-                m.opacity=THREE.MathUtils.lerp(m.opacity,isScatter?1:0,5*dt);
+                m.opacity=THREE.MathUtils.lerp(m.opacity,isScatter?1:0,4*dt);
                 photoGroup.lookAt(camera.position);
             }
 
             if(snowSystem){
+                // 暴风雪逻辑
                 const pos=snowSystem.geometry.attributes.position.array;
                 const vels=snowSystem.geometry.attributes.velocity.array;
-                STATE.blizzardIntensity=THREE.MathUtils.lerp(STATE.blizzardIntensity,0,0.5*dt);
-                const spd=1+STATE.blizzardIntensity*20; const wind=STATE.blizzardIntensity*20;
-                for(let i=0;i<3000;i++){
+                STATE.blizzardIntensity=THREE.MathUtils.lerp(STATE.blizzardIntensity,0,0.3*dt);
+                const spd=1+STATE.blizzardIntensity*15; const wind=STATE.blizzardIntensity*10;
+                for(let i=0;i<4000;i++){
                     pos[i*3]+=(vels[i*3]+wind)*spd*dt;
                     pos[i*3+1]+=vels[i*3+1]*spd*dt;
                     pos[i*3+2]+=vels[i*3+2]*spd*dt;
-                    if(pos[i*3+1]<-50)pos[i*3+1]=50; if(pos[i*3]>50)pos[i*3]=-50; if(pos[i*3]<-50)pos[i*3]=50;
+                    if(pos[i*3+1]<-60)pos[i*3+1]=60; if(pos[i*3]>60)pos[i*3]=-60; if(pos[i*3]<-60)pos[i*3]=60;
                 }
                 snowSystem.geometry.attributes.position.needsUpdate=true;
-                snowSystem.material.size=1.2+STATE.blizzardIntensity*2;
             }
 
             for(let i=flyingObjects.length-1;i>=0;i--){
                 const o=flyingObjects[i];
                 o.mesh.position.x+=o.speed*o.dir*dt;
-                o.mesh.position.y+=Math.sin(clock.elapsedTime*10)*0.2;
-                if(Math.abs(o.mesh.position.x)>60){scene.remove(o.mesh);flyingObjects.splice(i,1);}
+                o.mesh.position.y+=Math.sin(clock.elapsedTime*5)*0.1;
+                if(Math.abs(o.mesh.position.x)>80){scene.remove(o.mesh);flyingObjects.splice(i,1);}
             }
             composer.render();
         }
