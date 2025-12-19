@@ -3,90 +3,182 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Secret Mission</title>
+    <title>Top Secret Mission</title>
     <script src="https://cdn.bootcdn.net/ajax/libs/tailwindcss/3.3.3/cdn.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Noto+Serif+SC:wght@700&display=swap" rel="stylesheet">
+    
     <style>
-        body { background: #000; color: #0f0; font-family: 'Courier New', monospace; overflow: hidden; }
-        .scan-line {
-            position: fixed; top: 0; left: 0; width: 100%; height: 5px;
-            background: rgba(0, 255, 0, 0.5); box-shadow: 0 0 10px #0f0;
-            animation: scan 3s infinite linear; pointer-events: none; z-index: 10;
+        /* 背景改为深沉的夜色/木纹色，而不是纯黑 */
+        body { 
+            background: #0f172a; 
+            color: #e2e8f0; 
+            font-family: 'Noto Serif SC', serif; 
+            overflow: hidden; 
+            display: flex; justify-content: center; align-items: center; height: 100vh;
         }
-        @keyframes scan { 0% {top: -10%} 100% {top: 110%} }
-        
+
+        /* 魔法流光边框动画 */
+        @keyframes border-glow {
+            0%, 100% { box-shadow: 0 0 10px rgba(212, 175, 55, 0.2), inset 0 0 20px rgba(0,0,0,0.5); border-color: #927028; }
+            50% { box-shadow: 0 0 25px rgba(212, 175, 55, 0.6), inset 0 0 10px rgba(0,0,0,0.2); border-color: #ffd700; }
+        }
+
+        /* 卡片容器：磨砂玻璃 + 金边 */
         .card {
-            border: 1px solid #0f0; background: rgba(0, 20, 0, 0.9);
-            padding: 20px; margin: 20px; max-width: 400px;
-            box-shadow: 0 0 20px rgba(0, 255, 0, 0.2);
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 85%; text-align: center;
+            background: rgba(15, 23, 42, 0.95);
+            border: 2px solid #d4af37;
+            padding: 30px 20px; 
+            width: 85%; max-width: 400px;
+            text-align: center;
+            border-radius: 12px;
+            position: relative;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            animation: border-glow 3s infinite ease-in-out;
+            transition: all 0.5s ease;
         }
+
+        /* 标题样式：机密打字机风 */
+        .secret-title {
+            font-family: 'Special Elite', cursive;
+            color: #d4af37;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        /* 按钮：暗红高级感 */
         .btn {
-            background: #0f0; color: #000; border: none; padding: 10px 30px;
-            font-weight: bold; margin-top: 20px; cursor: pointer;
-            font-family: 'Courier New', monospace;
+            background: linear-gradient(to bottom, #8b0000, #5a0000);
+            color: #ffd700;
+            border: 1px solid #ffd700;
+            padding: 14px 30px;
+            font-weight: bold; margin-top: 25px; cursor: pointer;
+            font-family: 'Special Elite', cursive;
+            font-size: 1.1rem;
+            border-radius: 4px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            transition: transform 0.2s;
+            width: 100%;
         }
-        .hidden { display: none; }
+        .btn:active { transform: scale(0.96); }
+
+        .hidden { display: none !important; }
         
-        /* 语音按钮 */
+        /* 语音按钮优化 */
         .audio-btn {
-            position: absolute; top: 10px; right: 10px;
-            border: 1px solid #0f0; background: rgba(0,255,0,0.1); color: #0f0;
-            font-size: 12px; padding: 5px 10px; cursor: pointer;
+            position: absolute; top: 15px; right: 15px;
+            border: 1px solid #d4af37; 
+            background: rgba(212, 175, 55, 0.1); 
+            color: #d4af37;
+            font-size: 10px; padding: 4px 8px; cursor: pointer;
+            border-radius: 4px;
         }
+
+        /* 闪烁文字 */
+        .blink { animation: blinker 2s linear infinite; color: #94a3b8; }
+        @keyframes blinker { 50% { opacity: 0; } }
+
+        /* 任务文本样式 */
+        .mission-list p { margin-bottom: 12px; font-size: 1rem; color: #cbd5e1; }
+        .highlight { color: #fbbf24; font-weight: bold; }
     </style>
 </head>
 <body>
-    <div class="scan-line"></div>
 
     <div class="card" id="envelope" onclick="openLetter()">
-        <h1 class="text-2xl mb-4">CONFIDENTIAL</h1>
-        <p class="text-sm mb-4">TOP SECRET // EYES ONLY</p>
-        <div class="text-4xl my-6">📩</div>
-        <p class="text-xs blink">TAP TO DECRYPT</p>
+        <div class="mb-6 opacity-80">
+            <svg class="w-16 h-16 mx-auto text-yellow-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"></path></svg>
+        </div>
+        <h1 class="text-3xl mb-2 secret-title">TOP SECRET</h1>
+        <p class="text-xs tracking-[0.3em] text-slate-500 mb-8">EYES ONLY // XHGD-2025</p>
+        
+        <div class="blink mt-4 text-xs tracking-widest border border-slate-700 inline-block px-3 py-1 rounded-full">
+            TAP TO DECRYPT <br> 点击解密指令
+        </div>
     </div>
 
     <div class="card hidden" id="letter">
-        <button class="audio-btn" onclick="playAudio()">🔊 播放指令</button>
-        <h2 class="text-xl mb-4 border-b border-green-500 pb-2">MISSION #2025</h2>
-        <div class="text-left text-sm leading-relaxed space-y-4" id="mission-text"></div>
-        <button class="btn" onclick="acceptMission()">ACCEPT MISSION</button>
+        <button class="audio-btn" onclick="playAudio()">🔊 重新宣读</button>
+        
+        <h2 class="text-xl mb-6 border-b border-yellow-700/50 pb-4 secret-title text-yellow-500">
+            MISSION #2025
+        </h2>
+        
+        <div class="text-left text-sm leading-relaxed" id="mission-text">
+            </div>
+        
+        <button class="btn" onclick="acceptMission()">
+            接受任务<br><span style="font-size:0.8rem; opacity:0.8">ACCEPT MISSION</span>
+        </button>
     </div>
 
     <script>
         const params = new URLSearchParams(window.location.search);
-        const name = params.get('name') || 'Agent';
+        const name = params.get('name') || '特工';
         
+        // 优化后的文案，加了颜色高亮 class
         const missionContent = `
-            <p>特工 ${name}：</p>
-            <p>你的圣诞礼物已被锁定在全息空间中。</p>
-            <p><strong>解锁条件：</strong></p>
-            <p>1. 找到你的爸爸妈妈。</p>
-            <p>2. 给他们一个大大的拥抱。</p>
-            <p>3. 对他们说声“我爱你”。</p>
-            <p>完成后，点击下方按钮激活全息投影。</p>
+            <div class="mission-list">
+                <p>特工 <span class="highlight">${name}</span>：</p>
+                <p>你的圣诞礼物已被锁定在北极全息空间中。</p>
+                <div class="bg-slate-800/50 p-4 rounded-lg border border-slate-700 my-4">
+                    <p class="text-yellow-500 text-xs mb-2 tracking-widest">UNLOCK REQUIREMENTS:</p>
+                    <p>1. 找到你的 <span class="highlight">爸爸妈妈</span>。</p>
+                    <p>2. 给他们一个大大的 <span class="highlight">拥抱</span>。</p>
+                    <p>3. 亲口对他们说声 <span class="highlight">“我爱你”</span>。</p>
+                </div>
+                <p class="text-xs text-center text-slate-400 mt-2">完成后，点击下方按钮激活礼物。</p>
+            </div>
         `;
         
-        const speechContent = `特工${name}，你的圣诞礼物已被锁定。解锁条件：找到爸爸妈妈，给他们一个大大的拥抱，并说一声我爱你。完成后，点击按钮激活礼物。`;
+        // 朗读文案 - 保持简练
+        const speechContent = `特工${name}，请注意。你的圣诞礼物已被锁定。解锁条件如下：第一，找到爸爸妈妈。第二，给他们一个大大的拥抱。第三，亲口说一声“我爱你”。执行完毕后，点击按钮激活礼物。Action!`;
 
         document.getElementById('mission-text').innerHTML = missionContent;
 
         function playAudio() {
             window.speechSynthesis.cancel();
             const u = new SpeechSynthesisUtterance(speechContent);
-            u.lang = 'zh-CN'; u.rate = 1.0;
+            u.lang = 'zh-CN'; 
+            u.rate = 0.9; // 语速稍慢，更有严肃感
+            // 尝试找中文语音
+            const voices = window.speechSynthesis.getVoices();
+            const zh = voices.find(v => v.lang.includes('zh'));
+            if(zh) u.voice = zh;
+            
             window.speechSynthesis.speak(u);
         }
 
         function openLetter() {
-            document.getElementById('envelope').classList.add('hidden');
-            document.getElementById('letter').classList.remove('hidden');
-            playAudio(); // 自动尝试播放
+            // 简单的转场逻辑
+            const env = document.getElementById('envelope');
+            env.style.opacity = '0';
+            env.style.transform = 'scale(0.9)';
+            
+            setTimeout(() => {
+                env.classList.add('hidden');
+                const letter = document.getElementById('letter');
+                letter.classList.remove('hidden');
+                // 简单的入场动画
+                letter.style.opacity = '0';
+                letter.style.transform = 'translate(-50%, -40%)'; // 初始位置略高
+                
+                // 强制重绘
+                void letter.offsetWidth; 
+                
+                letter.style.opacity = '1';
+                letter.style.transform = 'translate(-50%, -50%)'; // 回到正中
+
+                playAudio(); // 尝试自动播放
+            }, 300);
         }
 
         function acceptMission() {
+            // 跳转到最后的魔法粒子页
             window.location.href = `magic.html${window.location.search}`;
         }
+        
+        // 预加载语音
+        window.speechSynthesis.getVoices();
     </script>
 </body>
 </html>
