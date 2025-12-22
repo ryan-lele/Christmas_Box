@@ -4,8 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Certificate of Excellence</title>
+    
+    <link rel="prefetch" href="mission.html">
+
     <script src="https://cdn.bootcdn.net/ajax/libs/tailwindcss/3.3.3/cdn.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@700&display=swap" rel="stylesheet">
+    
+    <link href="https://fonts.loli.net/css2?family=Cinzel:wght@700&family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@700&display=swap" rel="stylesheet">
+    
     <style>
         body { 
             background: #1a0b00; 
@@ -13,9 +18,12 @@
             font-family: "KaiTi", "STKaiti", "Noto Serif SC", serif; /* 强制楷体 */
             overflow: hidden; 
             margin: 0;
+            /* ⚡️ [核心优化 3] 视口高度修正，兼容移动端动态栏 */
+            min-height: 100vh;
+            min-height: 100dvh;
         }
 
-        /* 羊皮纸背景 (纯CSS模拟，防链接失效) */
+        /* 羊皮纸背景 */
         .parchment {
             position: fixed; inset: 15px; 
             background-color: #f4e4bc;
@@ -37,12 +45,12 @@
         .corner.br { bottom: 10px; right: 10px; transform: rotate(180deg); }
         .corner.bl { bottom: 10px; left: 10px; transform: rotate(-90deg); }
 
-       /* 印章 (图片版) - 修复版 */
+       /* 印章 (图片版) */
         .seal-img {
             width: 160px; height: 160px; 
-            object-fit: cover; /* 确保图片填满圆圈，不变形 */
-            border-radius: 50%; /* 【关键】把方形切成圆形 */
-            border: 2px solid rgba(139, 0, 0, 0.3); /* 加个淡淡的红边，像贴纸一样 */
+            object-fit: cover; 
+            border-radius: 50%; 
+            border: 2px solid rgba(139, 0, 0, 0.3); 
             
             transform: scale(2) rotate(-20deg); 
             opacity: 0; 
@@ -60,6 +68,8 @@
             font-family: 'Cinzel', serif; font-size: 1.1rem; letter-spacing: 1px;
             opacity: 0; pointer-events: none; transition: opacity 1s;
             box-shadow: 0 5px 15px rgba(139, 0, 0, 0.4);
+            /* ⚡️ [小优化] 增加点击区域反馈 */
+            active: scale(0.95);
         }
 
         /* 朗读按钮 */
@@ -106,14 +116,13 @@
         const name = params.get('name') || '宝贝';
         document.getElementById('child-name').innerText = name;
 
-        // 优化朗读文案：更自然，去掉了机器味
+        // 优化朗读文案
         const speechText = `祝贺你，${name}。北极委员会已经批准了你的礼物申请。这是你的好孩子证书。现在，请点击下方的按钮，接受你的秘密任务。`;
 
         function playAudio() {
             window.speechSynthesis.cancel();
             const u = new SpeechSynthesisUtterance(speechText);
             u.lang = 'zh-CN'; u.rate = 1.0; 
-            // 尝试指定中文语音（如果不生效会自动回退）
             const voices = window.speechSynthesis.getVoices();
             const zhVoice = voices.find(v => v.lang.includes('zh'));
             if(zhVoice) u.voice = zhVoice;
@@ -122,19 +131,19 @@
 
         // 盖章逻辑
         let stamped = false;
+        
         // 自动盖章（进页面1秒后）
         setTimeout(() => {
             if (stamped) return;
             stamped = true;
             
-            // 播放一个“咚”的盖章音效（可选，如果有 seal.mp3）
-            // new Audio('seal.mp3').play().catch(()=>{});
-
             document.getElementById('seal').classList.add('stamped');
             
-            // 盖章动画完成后，自动朗读
+            // 盖章动画完成后，尝试朗读（注：移动端可能需要用户交互才能播放声音，所以保留了顶部的朗读按钮）
             setTimeout(() => {
-                playAudio();
+                // 尝试自动播放，若被浏览器拦截则静默失败，等待用户点击按钮
+                try { playAudio(); } catch(e){}
+                
                 // 显示下一步按钮
                 const btn = document.getElementById('btn-next');
                 btn.style.opacity = 1;
@@ -143,6 +152,7 @@
         }, 800);
 
         window.goNext = function() {
+            // 保留URL参数（名字和语言）
             window.location.href = `mission.html${window.location.search}`;
         }
         
