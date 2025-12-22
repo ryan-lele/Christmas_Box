@@ -20,7 +20,7 @@
             background-color: #020617; 
             color: #fff; 
             margin: 0; 
-            /* ⚡️ [核心优化 3] 使用 dvh 兼容移动端浏览器底部栏变化 */
+            /* ⚡️ [核心优化 3] 兼容移动端底部栏 */
             min-height: 100vh;
             min-height: 100dvh; 
             overflow-x: hidden; 
@@ -209,7 +209,8 @@
     </div>
 
     <script type="module">
-        import { Renderer, Program, Mesh, Color, Triangle } from 'https://cdn.skypack.dev/ogl';
+        // 🛠️ [修复] 替换为 unpkg 稳定源，防止 WebGL 极光背景加载失败
+        import { Renderer, Program, Mesh, Color, Triangle } from 'https://unpkg.com/ogl/dist/ogl.mjs';
         
         // --- 1. 参数系统 ---
         const params = new URLSearchParams(window.location.search);
