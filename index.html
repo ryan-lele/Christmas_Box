@@ -5,9 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>North Pole Connection Terminal</title>
     
+    <link rel="prefetch" href="certificate.html">
+    <link rel="prefetch" href="mission.html">
+    <link rel="prefetch" href="magic.html">
+
     <script src="https://cdn.bootcdn.net/ajax/libs/tailwindcss/3.3.3/cdn.min.js"></script>
     <script src="https://cdn.bootcdn.net/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Noto+Serif+SC:wght@300;700&family=Ma+Shan+Zheng&family=Special+Elite&display=swap" rel="stylesheet">
+    
+    <link href="https://fonts.loli.net/css2?family=Cinzel:wght@700&family=Noto+Serif+SC:wght@300;700&family=Ma+Shan+Zheng&family=Special+Elite&display=swap" rel="stylesheet">
     
     <style>
         /* --- 基础设定 --- */
@@ -15,13 +20,16 @@
             background-color: #020617; 
             color: #fff; 
             margin: 0; 
+            /* ⚡️ [核心优化 3] 使用 dvh 兼容移动端浏览器底部栏变化 */
+            min-height: 100vh;
+            min-height: 100dvh; 
             overflow-x: hidden; 
             font-family: 'Noto Serif SC', serif;
             -webkit-font-smoothing: antialiased;
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* --- 顶部品牌栏 (New) --- */
+        /* --- 顶部品牌栏 --- */
         .brand-bar {
             position: fixed;
             top: 0; left: 0; right: 0;
@@ -82,7 +90,7 @@
             margin-bottom: 40px;
         }
 
-        /* 解封按钮 (优化版) */
+        /* 解封按钮 */
         .decrypt-btn { 
             opacity: 0; 
             background: transparent;
@@ -114,7 +122,7 @@
         /* --- 视频区域 (C位) --- */
         .video-wrapper {
             width: 100%;
-            max-width: 450px; /* 限制最大宽度，防止PC端太大 */
+            max-width: 450px; 
             margin: 0 auto 30px auto;
             border-radius: 12px;
             overflow: hidden;
@@ -168,6 +176,7 @@
     <div class="magic-dock">
         <a href="javascript:navTo('certificate.html')" class="dock-btn" title="证书">📜</a>
         <a href="javascript:navTo('mission.html')" class="dock-btn" title="任务">💌</a>
+        <a href="javascript:navTo('magic.html')" class="dock-btn" title="魔法">✨</a>
     </div>
 
     <div id="cinema-intro">
@@ -236,15 +245,14 @@
 
         // 视频播放结束监听 -> 自动跳转
         santaVideo.addEventListener('ended', () => {
-            // 视频结束后，延迟1秒跳转，给用户一点反应时间
             setTimeout(() => {
                 navTo('certificate.html');
             }, 800);
         });
 
         hintBtn.addEventListener('click', () => {
-            // A. 播放BGM (必须在点击事件中触发)
-            bgm.volume = 0.3; // 声音不要太大，以免盖过视频
+            // A. 播放BGM
+            bgm.volume = 0.3; 
             bgm.play().catch(e => console.log('Audio play failed', e));
 
             // B. 转场动画
@@ -257,12 +265,10 @@
             // C. 启动极光
             initAurora();
 
-            // D. 播放视频 (延迟一点点，等转场开始)
+            // D. 播放视频
             setTimeout(() => {
                 santaVideo.play().then(() => {
-                    // 视频开始播放后，淡出BGM或者保持低音量
                 }).catch(e => {
-                    // 如果自动播放失败（浏览器策略），显示播放按钮
                     santaVideo.controls = true;
                 });
             }, 500);
