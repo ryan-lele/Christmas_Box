@@ -15,12 +15,10 @@
     <link href="https://fonts.loli.net/css2?family=Cinzel:wght@700&family=Noto+Serif+SC:wght@300;700&family=Ma+Shan+Zheng&family=Special+Elite&display=swap" rel="stylesheet">
     
     <style>
-        /* --- 基础设定 --- */
         body { 
             background-color: #020617; 
             color: #fff; 
             margin: 0; 
-            /* ⚡️ [核心优化 3] 兼容移动端底部栏 */
             min-height: 100vh;
             min-height: 100dvh; 
             overflow-x: hidden; 
@@ -29,82 +27,43 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* --- 顶部品牌栏 --- */
         .brand-bar {
-            position: fixed;
-            top: 0; left: 0; right: 0;
-            height: 60px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 100;
+            position: fixed; top: 0; left: 0; right: 0; height: 60px;
+            display: flex; justify-content: center; align-items: center; z-index: 100;
             background: linear-gradient(to bottom, rgba(2,6,23,0.9), transparent);
             pointer-events: none;
         }
         .brand-logo {
-            font-family: 'Cinzel', serif;
-            color: #fbbf24;
-            font-size: 1.2rem;
-            letter-spacing: 2px;
-            text-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
-            font-weight: bold;
+            font-family: 'Cinzel', serif; color: #fbbf24; font-size: 1.2rem;
+            letter-spacing: 2px; text-shadow: 0 0 10px rgba(251, 191, 36, 0.5); font-weight: bold;
         }
 
-        /* --- 视觉特效：黑金流光字 --- */
         .gold-text {
             background: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
-            -webkit-background-clip: text; 
-            background-clip: text; 
-            color: transparent;
+            -webkit-background-clip: text; background-clip: text; color: transparent;
             text-shadow: 0 0 30px rgba(251, 191, 36, 0.3);
-            background-size: 200% auto; 
-            animation: shine 5s linear infinite;
+            background-size: 200% auto; animation: shine 5s linear infinite;
         }
         @keyframes shine { to { background-position: 200% center; } }
 
-        /* --- 开场幕布 (Intro Layer) --- */
         #cinema-intro {
-            position: fixed; 
-            inset: 0; 
-            background: #020617; 
-            z-index: 9999;
-            display: flex; 
-            flex-direction: column; 
-            justify-content: center; 
-            align-items: center;
-            padding: 40px; 
-            text-align: center; 
-            cursor: pointer;
+            position: fixed; inset: 0; background: #020617; z-index: 9999;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            padding: 40px; text-align: center; cursor: pointer;
         }
         
-        /* 打字机文字样式 */
         .intro-text {
-            font-family: 'Special Elite', monospace; 
-            color: #fbbf24; 
-            font-size: 1.1rem; 
-            line-height: 1.8;
-            text-shadow: 0 0 10px rgba(251, 191, 36, 0.5); 
-            min-height: 150px;
-            max-width: 600px;
-            text-align: left;
-            margin-bottom: 40px;
+            font-family: 'Special Elite', monospace; color: #fbbf24; 
+            font-size: 1.1rem; line-height: 1.8; text-shadow: 0 0 10px rgba(251, 191, 36, 0.5); 
+            min-height: 150px; max-width: 600px; text-align: left; margin-bottom: 40px;
         }
 
-        /* 解封按钮 */
         .decrypt-btn { 
-            opacity: 0; 
-            background: transparent;
-            color: #fbbf24; 
-            font-family: 'Cinzel', serif;
-            font-size: 1rem; 
-            letter-spacing: 2px; 
-            text-transform: uppercase; 
-            border: 1px solid rgba(251, 191, 36, 0.4); 
-            padding: 16px 32px; 
-            border-radius: 4px;
-            transition: 0.3s;
-            position: relative;
-            overflow: hidden;
+            opacity: 0; background: transparent; color: #fbbf24; 
+            font-family: 'Cinzel', serif; font-size: 1rem; letter-spacing: 2px; 
+            text-transform: uppercase; border: 1px solid rgba(251, 191, 36, 0.4); 
+            padding: 16px 32px; border-radius: 4px; transition: 0.3s;
+            position: relative; overflow: hidden;
         }
         .decrypt-btn::before {
             content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
@@ -113,39 +72,20 @@
         }
         @keyframes scan { 0% {left: -100%} 100% {left: 200%} }
 
-        /* --- 主舞台 (Main Stage) --- */
         #main-stage { opacity: 0; transition: opacity 2s; position: relative; z-index: 10; padding-top: 70px; }
-        
-        /* 极光背景容器 */
         #aurora-bg { position: fixed; inset: 0; z-index: -2; opacity: 0.6; pointer-events: none; }
         
-        /* --- 视频区域 (C位) --- */
         .video-wrapper {
-            width: 100%;
-            max-width: 450px; 
-            margin: 0 auto 30px auto;
-            border-radius: 12px;
-            overflow: hidden;
+            width: 100%; max-width: 450px; margin: 0 auto 30px auto;
+            border-radius: 12px; overflow: hidden;
             box-shadow: 0 0 40px rgba(251, 191, 36, 0.2);
             border: 1px solid rgba(251, 191, 36, 0.3);
-            position: relative;
-            aspect-ratio: 9/16;
-            background: #000;
+            position: relative; aspect-ratio: 9/16; background: #000;
         }
-        video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
+        video { width: 100%; height: 100%; object-fit: cover; display: block; }
 
-        /* --- 底部文字 --- */
-        .main-content {
-            text-align: center;
-            padding: 0 20px 50px 20px;
-        }
+        .main-content { text-align: center; padding: 0 20px 50px 20px; }
 
-        /* --- 魔法导航坞 (Side Dock) --- */
         .magic-dock { 
             position: fixed; right: 20px; bottom: 40px; 
             display: flex; flex-direction: column; gap: 15px; z-index: 5000; 
@@ -158,20 +98,14 @@
             border: 1px solid rgba(251, 191, 36, 0.3);
         }
 
-        /* 动画定义 */
         @keyframes fall { to { transform: translateY(110vh); } }
         .snowflake { position: absolute; background: white; border-radius: 50%; opacity: 0.8; animation: fall linear infinite; pointer-events: none; }
     </style>
 </head>
 <body>
+    <audio id="bgm" loop><source src="bgm.mp3" type="audio/mp3"></audio>
 
-    <audio id="bgm" loop>
-        <source src="bgm.mp3" type="audio/mp3">
-    </audio>
-
-    <div class="brand-bar">
-        <div class="brand-logo">XHGD · SNOWFLAKE KINGDOM</div>
-    </div>
+    <div class="brand-bar"><div class="brand-logo">XHGD · SNOWFLAKE KINGDOM</div></div>
 
     <div class="magic-dock">
         <a href="javascript:navTo('certificate.html')" class="dock-btn" title="证书">📜</a>
@@ -189,30 +123,22 @@
     <div id="main-stage">
         <div id="aurora-bg"></div>
         <div id="snow-container"></div>
-
         <div class="video-wrapper">
             <video id="santaVideo" playsinline poster="poster_xhgd.jpg" webkit-playsinline>
                 <source src="santa_video.mp4" type="video/mp4">
             </video>
         </div>
-
         <div class="main-content">
             <h1 class="text-4xl font-bold mb-2 gold-text" style="font-family: 'Ma Shan Zheng', cursive;">圣诞快乐</h1>
-            <div class="text-xs tracking-[0.3em] text-yellow-100/60 mb-8 font-serif uppercase">
-                Encrypted Signal Verified
-            </div>
-            
+            <div class="text-xs tracking-[0.3em] text-yellow-100/60 mb-8 font-serif uppercase">Encrypted Signal Verified</div>
             <button onclick="navTo('certificate.html')" class="text-yellow-500 border-b border-yellow-500 pb-1 text-sm opacity-60">
                 跳过视频，直接领取证书 &rarr;
             </button>
         </div>
     </div>
 
-    <script type="module">
-        // 🛠️ [修复] 替换为 unpkg 稳定源，防止 WebGL 极光背景加载失败
-        import { Renderer, Program, Mesh, Color, Triangle } from 'https://unpkg.com/ogl/dist/ogl.mjs';
-        
-        // --- 1. 参数系统 ---
+    <script>
+        // 1. 参数系统
         const params = new URLSearchParams(window.location.search);
         const name = params.get('name') || '宝贝'; 
         const lang = params.get('lang') || 'zh';
@@ -220,10 +146,8 @@
             window.location.href = `${page}?name=${encodeURIComponent(name)}&lang=${lang}`;
         }
 
-        // --- 2. 文本内容 ---
+        // 2. 打字机逻辑 (保证 100% 运行)
         const introText = `SYSTEM ID: 2025-XHGD\nTo: ${name}\n\n检测到加密的北极信号...\n来源：Snowflake Kingdom (雪花国度)\n\n请求接入许可...`;
-
-        // --- 3. 打字机逻辑 ---
         const typeArea = document.getElementById('typewriter-area');
         const hintBtn = document.getElementById('tap-hint');
         let charIndex = 0;
@@ -235,76 +159,49 @@
                 charIndex++;
                 setTimeout(typeWriter, 40);
             } else {
-                gsap.to(hintBtn, {opacity: 1, duration: 1});
+                // 如果 gsap 加载失败，用原生兼容
+                if(window.gsap) {
+                    gsap.to(hintBtn, {opacity: 1, duration: 1});
+                } else {
+                    hintBtn.style.opacity = 1;
+                }
             }
         }
-        setTimeout(typeWriter, 500);
+        // 确保页面加载后立即执行
+        window.addEventListener('load', () => setTimeout(typeWriter, 500));
 
-        // --- 4. 核心交互 (点击解封) ---
+        // 3. 核心交互
         const santaVideo = document.getElementById('santaVideo');
         const bgm = document.getElementById('bgm');
 
-        // 视频播放结束监听 -> 自动跳转
         santaVideo.addEventListener('ended', () => {
-            setTimeout(() => {
-                navTo('certificate.html');
-            }, 800);
+            setTimeout(() => { navTo('certificate.html'); }, 800);
         });
 
         hintBtn.addEventListener('click', () => {
-            // A. 播放BGM
             bgm.volume = 0.3; 
             bgm.play().catch(e => console.log('Audio play failed', e));
 
-            // B. 转场动画
-            gsap.to("#cinema-intro", { 
-                opacity: 0, duration: 1, pointerEvents: "none",
-                onComplete: () => { document.getElementById('cinema-intro').style.display = 'none'; }
-            });
-            gsap.to("#main-stage", { opacity: 1, duration: 1.5 });
-            
-            // C. 启动极光
-            initAurora();
-
-            // D. 播放视频
-            setTimeout(() => {
-                santaVideo.play().then(() => {
-                }).catch(e => {
-                    santaVideo.controls = true;
+            if(window.gsap) {
+                gsap.to("#cinema-intro", { 
+                    opacity: 0, duration: 1, pointerEvents: "none",
+                    onComplete: () => { document.getElementById('cinema-intro').style.display = 'none'; }
                 });
+                gsap.to("#main-stage", { opacity: 1, duration: 1.5 });
+            } else {
+                document.getElementById('cinema-intro').style.display = 'none';
+                document.getElementById('main-stage').style.opacity = 1;
+            }
+
+            // 尝试启动极光 (如果在另一段脚本里加载成功的话)
+            if(window.initAurora) window.initAurora();
+
+            setTimeout(() => {
+                santaVideo.play().catch(e => { santaVideo.controls = true; });
             }, 500);
         });
 
-        // --- 5. 极光背景 (WebGL) ---
-        function initAurora() {
-            const ctn = document.getElementById('aurora-bg');
-            if(ctn.children.length > 0) return;
-            const renderer = new Renderer({alpha: true, dpr: 1});
-            const gl = renderer.gl; 
-            ctn.appendChild(gl.canvas);
-            const program = new Program(gl, {
-                vertex: `#version 300 es
-                in vec2 position; void main(){ gl_Position = vec4(position, 0.0, 1.0); }`,
-                fragment: `#version 300 es
-                precision highp float; uniform float uTime; uniform vec2 uResolution; out vec4 fragColor;
-                float random (in vec2 st) { return fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453123); }
-                float noise (in vec2 st) { vec2 i = floor(st); vec2 f = fract(st); float a = random(i); float b = random(i + vec2(1.0, 0.0)); float c = random(i + vec2(0.0, 1.0)); float d = random(i + vec2(1.0, 1.0)); vec2 u = f * f * (3.0 - 2.0 * f); return mix(a, b, u.x) + (c - a)* u.y * (1.0 - u.x) + (d - b) * u.x * u.y; }
-                void main() {
-                    vec2 uv = gl_FragCoord.xy / uResolution;
-                    float n = noise(uv * 3.0 + vec2(uTime * 0.1, uTime * 0.2));
-                    float alpha = smoothstep(0.4, 0.8, n);
-                    vec3 color = vec3(0.05, 0.4, 0.3); // 深绿极光
-                    fragColor = vec4(color, alpha * 0.3); 
-                }`,
-                uniforms: { uTime: { value: 0 }, uResolution: { value: [window.innerWidth, window.innerHeight] } }
-            });
-            const mesh = new Mesh(gl, { geometry: new Triangle(gl), program });
-            function resize() { renderer.setSize(window.innerWidth, window.innerHeight); program.uniforms.uResolution.value = [window.innerWidth, window.innerHeight]; }
-            window.addEventListener('resize', resize); resize();
-            requestAnimationFrame(function update(t) { program.uniforms.uTime.value = t * 0.001; renderer.render({ scene: mesh }); requestAnimationFrame(update); });
-        }
-        
-        // --- 6. 雪花 ---
+        // 4. 雪花逻辑
         const snowCtn = document.getElementById('snow-container');
         setInterval(() => {
             if(document.hidden) return;
@@ -315,6 +212,47 @@
             snowCtn.appendChild(f);
             setTimeout(() => f.remove(), 10000);
         }, 300);
+    </script>
+
+    <script type="module">
+        // 使用 esm.sh 这种更现代的 CDN，它会自动处理依赖关系
+        import { Renderer, Program, Mesh, Triangle } from 'https://esm.sh/ogl@1.0.11';
+
+        window.initAurora = function() {
+            try {
+                const ctn = document.getElementById('aurora-bg');
+                if(ctn.children.length > 0) return;
+                
+                const renderer = new Renderer({alpha: true, dpr: 1});
+                const gl = renderer.gl; 
+                ctn.appendChild(gl.canvas);
+                
+                const program = new Program(gl, {
+                    vertex: `#version 300 es
+                    in vec2 position; void main(){ gl_Position = vec4(position, 0.0, 1.0); }`,
+                    fragment: `#version 300 es
+                    precision highp float; uniform float uTime; uniform vec2 uResolution; out vec4 fragColor;
+                    float random (in vec2 st) { return fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453123); }
+                    float noise (in vec2 st) { vec2 i = floor(st); vec2 f = fract(st); float a = random(i); float b = random(i + vec2(1.0, 0.0)); float c = random(i + vec2(0.0, 1.0)); float d = random(i + vec2(1.0, 1.0)); vec2 u = f * f * (3.0 - 2.0 * f); return mix(a, b, u.x) + (c - a)* u.y * (1.0 - u.x) + (d - b) * u.x * u.y; }
+                    void main() {
+                        vec2 uv = gl_FragCoord.xy / uResolution;
+                        float n = noise(uv * 3.0 + vec2(uTime * 0.1, uTime * 0.2));
+                        float alpha = smoothstep(0.4, 0.8, n);
+                        vec3 color = vec3(0.05, 0.4, 0.3);
+                        fragColor = vec4(color, alpha * 0.3); 
+                    }`,
+                    uniforms: { uTime: { value: 0 }, uResolution: { value: [window.innerWidth, window.innerHeight] } }
+                });
+                
+                const mesh = new Mesh(gl, { geometry: new Triangle(gl), program });
+                function resize() { renderer.setSize(window.innerWidth, window.innerHeight); program.uniforms.uResolution.value = [window.innerWidth, window.innerHeight]; }
+                window.addEventListener('resize', resize); resize();
+                requestAnimationFrame(function update(t) { program.uniforms.uTime.value = t * 0.001; renderer.render({ scene: mesh }); requestAnimationFrame(update); });
+            } catch (err) {
+                console.warn("Aurora initialization failed (WebGL error):", err);
+                // 即使 WebGL 失败，因为代码分离了，页面其他功能不受影响
+            }
+        }
     </script>
 </body>
 </html>
